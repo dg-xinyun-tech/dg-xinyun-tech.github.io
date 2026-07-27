@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>芯云智家 - 远距离高清图传技术专家</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+            color: #1e293b;
+            background: #fff;
+            line-height: 1.6;
+        }
+        .page { display: none; }
+        .page.active { display: block; }
+
+        /* 导航栏 */
+        .navbar {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+            padding: 0 60px; height: 72px;
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(10, 22, 40, 0.92);
+            backdrop-filter: blur(10px);
+            transition: background 0.3s;
+        }
+        .navbar.scrolled { background: #0a1628; box-shadow: 0 2px 20px rgba(0,0,0,0.3); }
+        .logo { font-size: 22px; font-weight: bold; color: #fff; cursor: pointer; }
+        .nav-links { display: flex; gap: 36px; list-style: none; }
+        .nav-links a {
+            color: rgba(255,255,255,0.8); text-decoration: none; font-size: 15px;
+            transition: color 0.3s; cursor: pointer;
+        }
+        .nav-links a.active, .nav-links a:hover { color: #4da3ff; }
+        .nav-right { display: flex; align-items: center; gap: 16px; position: relative; }
+        .lang-select {
+            padding: 8px 16px; background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2); border-radius: 6px;
+            color: #fff; font-size: 14px; cursor: pointer; user-select: none;
+        }
+        .lang-dropdown {
+            position: absolute; top: 100%; right: 100px; margin-top: 8px;
+            background: #fff; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            overflow: hidden; display: none; min-width: 120px; z-index: 1001;
+        }
+        .lang-dropdown.show { display: block; }
+        .lang-option {
+            padding: 10px 16px; cursor: pointer; font-size: 14px; color: #333;
+            transition: background 0.2s;
+        }
+        .lang-option:hover { background: #f1f5f9; }
+        .btn-primary {
+            padding: 10px 24px;
+            background: linear-gradient(135deg, #4f46e5, #06b6d4);
+            color: #fff; border: none; border-radius: 8px; font-size: 15px;
+            font-weight: 500; cursor: pointer; text-decoration: none; display: inline-block;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(79,70,229,0.4); }
+        .btn-outline {
+            padding: 12px 32px; background: transparent; color: #4f46e5;
+            border: 2px solid #4f46e5; border-radius: 8px; font-size: 15px;
+            font-weight: 500; cursor: pointer; transition: all 0.3s;
+        }
+        .btn-outline:hover { background: #4f46e5; color: #fff; }
+
+        /* 首页 Hero */
+        .hero {
+            min-height: 100vh; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; text-align: center;
+            padding: 0 20px; padding-top: 72px;
+            background: linear-gradient(180deg, #0a1628 0%, #0f2847 50%, #0a1628 100%);
+            position: relative; overflow: hidden; color: #fff;
+        }
+        .hero::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background-image:
+                radial-gradient(circle at 20% 30%, rgba(59,130,246,0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(29,78,216,0.1) 0%, transparent 50%);
+        }
+        .hero-grid {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background-image:
+                linear-gradient(rgba(77,163,255,0.06) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(77,163,255,0.06) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+        .hero-content { position: relative; z-index: 1; }
+        .hero h1 { font-size: 64px; font-weight: bold; margin-bottom: 10px; line-height: 1.2; }
+        .hero h1 span {
+            background: linear-gradient(135deg, #4da3ff, #06b6d4);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .hero p { font-size: 22px; color: rgba(255,255,255,0.7); margin-bottom: 40px; }
+        .hero-buttons { display: flex; gap: 20px; justify-content: center; }
+        .hero-btn-white {
+            padding: 12px 32px; background: transparent; color: #fff;
+            border: 2px solid rgba(255,255,255,0.4); border-radius: 8px; font-size: 15px;
+            font-weight: 500; cursor: pointer; transition: all 0.3s;
+        }
+        .hero-btn-white:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.6); }
+        .scroll-down {
+            position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+            animation: bounce 2s infinite; font-size: 28px; color: rgba(255,255,255,0.4); cursor: pointer;
+        }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+            40% { transform: translateX(-50%) translateY(-10px); }
+            60% { transform: translateX(-50%) translateY(-5px); }
+        }
+
+        /* 通用区块 */
+        .section { padding: 100px 60px; }
+        .section-white { background: #f8fafc; }
+        .section-dark { background: #0a1628; color: #fff; }
+        .page-banner {
+            padding: 140px 60px 80px; text-align: center;
+            background: linear-gradient(135deg, #0a1628, #112240); color: #fff;
+        }
+        .page-banner h1 { font-size: 44px; font-weight: bold; margin-bottom: 15px; }
+        .page-banner p { font-size: 18px; color: rgba(255,255,255,0.7); }
+        .section-header { text-align: center; margin-bottom: 60px; }
+        .section-header h2 { font-size: 36px; font-weight: bold; margin-bottom: 15px; }
+        .section-header p { font-size: 17px; color: #64748b; }
+        .section-dark .section-header p { color: rgba(255,255,255,0.6); }
+
+        /* 技术优势 */
+        .features-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px;
+            max-width: 1400px; margin: 0 auto;
+        }
+        .feature-card {
+            background: #fff; border-radius: 16px; padding: 35px 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06); transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .feature-card:hover { transform: translateY(-8px); box-shadow: 0 12px 40px rgba(0,0,0,0.1); }
+        .feature-icon {
+            width: 56px; height: 56px;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            margin-bottom: 20px; font-size: 26px; color: #fff;
+        }
+        .feature-card h3 { font-size: 20px; font-weight: bold; margin-bottom: 10px; }
+        .feature-card p { font-size: 15px; color: #64748b; line-height: 1.7; }
+
+        /* 产品预览（首页） */
+        .products-preview {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px;
+            max-width: 1400px; margin: 0 auto;
+        }
+        .product-preview-card {
+            background: linear-gradient(145deg, #112240, #0d1b30);
+            border-radius: 20px; overflow: hidden;
+            border: 1px solid rgba(77,163,255,0.2);
+            transition: transform 0.3s, border-color 0.3s; cursor: pointer;
+        }
+        .product-preview-card:hover {
+            transform: translateY(-10px); border-color: rgba(77,163,255,0.5);
+        }
+        .product-preview-img {
+            height: 220px; background: linear-gradient(135deg, #1a2d4d, #0f1f35);
+            display: flex; align-items: center; justify-content: center;
+            color: rgba(255,255,255,0.3); font-size: 18px; font-weight: bold;
+        }
+        .product-preview-info { padding: 25px; color: #fff; }
+        .product-preview-info h3 { font-size: 20px; font-weight: bold; margin-bottom: 15px; }
+        .product-preview-stats {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px;
+        }
+        .stat-mini { text-align: center; }
+        .stat-mini-val {
+            font-size: 20px; font-weight: bold;
+            background: linear-gradient(135deg, #4da3ff, #06b6d4);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .stat-mini-label { font-size: 11px; color: rgba(255,255,255,0.5); }
+
+        /* 产品详情页 */
+        .product-detail {
+            max-width: 1200px; margin: 0 auto; padding: 80px 60px;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;
+        }
+        .product-detail.alt { background: #f8fafc; }
+        .product-detail-img {
+            border-radius: 20px; overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            height: 400px;
+            background: linear-gradient(135deg, #1a2d4d, #0f1f35);
+            display: flex; align-items: center; justify-content: center;
+            color: rgba(255,255,255,0.4); font-size: 28px; font-weight: bold;
+        }
+        .product-detail-info h2 { font-size: 36px; font-weight: bold; margin-bottom: 10px; }
+        .product-detail-info .subtitle { font-size: 17px; color: #64748b; margin-bottom: 30px; }
+        .params-card {
+            background: #f8fafc; border-radius: 16px; padding: 25px; margin-bottom: 25px;
+        }
+        .product-detail.alt .params-card { background: #fff; }
+        .params-card h4 { font-size: 16px; font-weight: bold; margin-bottom: 15px; color: #1e293b; }
+        .param-item {
+            display: flex; align-items: center; gap: 10px; padding: 8px 0;
+            font-size: 15px; color: #334155;
+        }
+        .param-check { color: #3b82f6; font-weight: bold; }
+        .scene-tags { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 25px; }
+        .scene-tag {
+            padding: 6px 16px; background: #e0f2fe; color: #0369a1;
+            border-radius: 20px; font-size: 13px;
+        }
+        .product-buttons { display: flex; gap: 15px; }
+
+        /* 解决方案 */
+        .solution-row {
+            max-width: 1200px; margin: 0 auto; padding: 60px;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;
+        }
+        .solution-row.alt { background: #f8fafc; }
+        .solution-features {
+            background: #0f2847; border-radius: 20px; padding: 40px; color: #fff;
+        }
+        .solution-feature-item {
+            display: flex; align-items: center; gap: 15px; padding: 14px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 15px;
+        }
+        .solution-feature-item:last-child { border-bottom: none; }
+        .feature-check-icon {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6, #06b6d4);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 16px; flex-shrink: 0;
+        }
+        .solution-img {
+            border-radius: 20px; overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            height: 350px;
+            background: linear-gradient(135deg, #e0f2fe, #bae6fd);
+            display: flex; align-items: center; justify-content: center;
+            color: #0369a1; font-size: 22px; font-weight: 500;
+        }
+
+        /* 数据统计 */
+        .stats-section {
+            background: linear-gradient(135deg, #0a1628, #112240);
+            padding: 80px 60px; color: #fff;
+        }
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px;
+            max-width: 1200px; margin: 0 auto; text-align: center;
+        }
+        .stat-number {
+            font-size: 48px; font-weight: bold;
+            background: linear-gradient(135deg, #4da3ff, #06b6d4);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            margin-bottom: 10px;
+        }
+        .stat-label { font-size: 16px; color: rgba(255,255,255,0.7); }
+
+        /* 案例展示 */
+        .cases-list { max-width: 1200px; margin: 0 auto; padding: 60px; }
+        .case-card {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 50px;
+            padding: 50px 0; border-bottom: 1px solid #e2e8f0; align-items: center;
+        }
+        .case-card:last-child { border-bottom: none; }
+        .case-tag {
+            display: inline-block; padding: 4px 14px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: #fff; border-radius: 20px; font-size: 13px; margin-bottom: 15px;
+        }
+        .case-client { font-size: 14px; color: #64748b; margin-bottom: 10px; }
+        .case-card h3 { font-size: 28px; font-weight: bold; margin-bottom: 20px; }
+        .case-section { margin-bottom: 20px; }
+        .case-section h4 { font-size: 16px; font-weight: bold; margin-bottom: 10px; color: #1e293b; }
+        .case-section p { font-size: 15px; color: #475569; line-height: 1.8; }
+        .case-result {
+            background: #0f2847; border-radius: 16px; padding: 25px; color: #fff; margin-top: 20px;
+        }
+        .case-result-item {
+            display: flex; align-items: center; gap: 10px; padding: 8px 0; font-size: 14px;
+        }
+        .case-img {
+            border-radius: 20px; overflow: hidden;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.1);
+            height: 300px;
+            background: linear-gradient(135deg, #e0f2fe, #ddd6fe);
+            display: flex; align-items: center; justify-content: center;
+            color: #4f46e5; font-size: 20px; font-weight: 500;
+        }
+        .case-link {
+            color: #4f46e5; text-decoration: none; font-size: 15px; font-weight: 500;
+            cursor: pointer;
+        }
+        .case-link:hover { text-decoration: underline; }
+
+        /* 关于我们 */
+        .about-stats {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px;
+            max-width: 1200px; margin: 0 auto; padding: 80px 60px;
+        }
+        .about-stat-card {
+            text-align: center; padding: 30px;
+            background: #fff; border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        }
+        .about-stat-num {
+            font-size: 42px; font-weight: bold;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            margin-bottom: 8px;
+        }
+        .about-stat-label { font-size: 15px; color: #64748b; }
+
+        .timeline-section { padding: 80px 60px; background: #f8fafc; }
+        .timeline {
+            max-width: 800px; margin: 0 auto; position: relative;
+        }
+        .timeline::before {
+            content: ''; position: absolute; left: 50%; top: 0; bottom: 0;
+            width: 3px; background: linear-gradient(180deg, #3b82f6, #8b5cf6);
+            transform: translateX(-50%);
+        }
+        .timeline-item {
+            position: relative; width: 50%; padding: 20px 40px; margin-bottom: 30px;
+        }
+        .timeline-item.left { left: 0; text-align: right; }
+        .timeline-item.right { left: 50%; text-align: left; }
+        .timeline-dot {
+            position: absolute; top: 30px; width: 20px; height: 20px;
+            background: #fff; border: 4px solid #3b82f6; border-radius: 50%;
+            z-index: 1;
+        }
+        .timeline-item.left .timeline-dot { right: -10px; }
+        .timeline-item.right .timeline-dot { left: -10px; }
+        .timeline-card {
+            background: #fff; padding: 25px; border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            display: inline-block;
+        }
+        .timeline-year {
+            font-size: 32px; font-weight: bold;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            margin-bottom: 5px;
+        }
+        .timeline-title { font-size: 18px; font-weight: bold; margin-bottom: 8px; }
+        .timeline-desc { font-size: 14px; color: #64748b; }
+
+        /* 联系我们 */
+        .contact-section {
+            max-width: 1200px; margin: 0 auto; padding: 80px 60px;
+            display: grid; grid-template-columns: 1fr 1.2fr; gap: 60px;
+        }
+        .contact-info-card {
+            background: #fff; border-radius: 16px; padding: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06); margin-bottom: 20px;
+            display: flex; align-items: center; gap: 15px;
+        }
+        .contact-icon {
+            width: 48px; height: 48px; border-radius: 12px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 20px; flex-shrink: 0;
+        }
+        .contact-info-label { font-size: 14px; color: #64748b; margin-bottom: 4px; }
+        .contact-info-value { font-size: 17px; font-weight: 500; color: #1e293b; }
+        .wechat-card {
+            background: #fff; border-radius: 16px; padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06); text-align: center;
+        }
+        .wechat-qr {
+            width: 160px; height: 160px; margin: 0 auto 15px;
+            background: #f1f5f9; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            color: #94a3b8; font-size: 40px;
+        }
+        .wechat-card p { font-size: 14px; color: #64748b; }
+
+        .contact-form {
+            background: #fff; border-radius: 20px; padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        }
+        .form-group { margin-bottom: 20px; }
+        .form-group label {
+            display: block; font-size: 14px; font-weight: 500;
+            margin-bottom: 8px; color: #334155;
+        }
+        .form-group label .required { color: #ef4444; }
+        .form-input, .form-textarea {
+            width: 100%; padding: 12px 16px;
+            border: 1px solid #e2e8f0; border-radius: 8px;
+            font-size: 15px; font-family: inherit;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .form-input:focus, .form-textarea:focus {
+            outline: none; border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+        }
+        .form-textarea { resize: vertical; min-height: 120px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .submit-btn {
+            width: 100%; padding: 14px;
+            background: linear-gradient(135deg, #4f46e5, #06b6d4);
+            color: #fff; border: none; border-radius: 10px;
+            font-size: 16px; font-weight: 500; cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(79,70,229,0.3); }
+        .form-tip { text-align: center; font-size: 12px; color: #94a3b8; margin-top: 15px; }
+
+        /* CTA 区块 */
+        .cta-section {
+            text-align: center; padding: 80px 60px;
+            background: linear-gradient(135deg, #0a1628, #112240); color: #fff;
+        }
+        .cta-section h2 { font-size: 32px; font-weight: bold; margin-bottom: 15px; }
+        .cta-section p { font-size: 17px; color: rgba(255,255,255,0.6); margin-bottom: 35px; }
+        .cta-buttons { display: flex; gap: 15px; justify-content: center; }
+
+        /* 页脚 */
+        .footer {
+            background: #060d1a; color: #fff; padding: 60px;
+        }
+        .footer-content {
+            max-width: 1400px; margin: 0 auto;
+            display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 50px;
+        }
+        .footer-logo { font-size: 20px; font-weight: bold; margin-bottom: 15px; }
+        .footer-desc { font-size: 14px; color: rgba(255,255,255,0.5); line-height: 1.8; }
+        .footer-col h4 { font-size: 15px; margin-bottom: 20px; }
+        .footer-col ul { list-style: none; }
+        .footer-col li { margin-bottom: 12px; }
+        .footer-col a {
+            color: rgba(255,255,255,0.5); text-decoration: none;
+            font-size: 14px; transition: color 0.3s; cursor: pointer;
+        }
+        .footer-col a:hover { color: #4da3ff; }
+        .footer-contact-item {
+            display: flex; align-items: center; gap: 10px;
+            font-size: 14px; color: rgba(255,255,255,0.5); margin-bottom: 12px;
+        }
+        .social-icons { display: flex; gap: 12px; }
+        .social-icon {
+            width: 36px; height: 36px; border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: background 0.3s; font-size: 14px;
+        }
+        .social-icon:hover { background: rgba(77,163,255,0.3); }
+        .footer-bottom {
+            max-width: 1400px; margin: 40px auto 0; padding-top: 30px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            text-align: center; font-size: 13px; color: rgba(255,255,255,0.4);
+        }
+        .footer-icp { margin-top: 8px; }
+
+        /* 响应式 */
+        @media (max-width: 1024px) {
+            .features-grid, .products-preview, .about-stats { grid-template-columns: repeat(2, 1fr); }
+            .product-detail, .solution-row, .contact-section { grid-template-columns: 1fr; }
+            .footer-content { grid-template-columns: repeat(2, 1fr); }
+            .case-card { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .navbar { padding: 0 20px; }
+            .nav-links { display: none; }
+            .hero h1 { font-size: 40px; }
+            .hero p { font-size: 18px; }
+            .section, .page-banner { padding: 60px 20px; }
+            .page-banner h1 { font-size: 32px; }
+            .features-grid, .products-preview, .about-stats { grid-template-columns: 1fr; }
+            .timeline::before { left: 20px; }
+            .timeline-item { width: 100%; left: 0 !important; text-align: left !important; padding-left: 50px; }
+            .timeline-dot { left: 10px !important; right: auto !important; }
+            .footer-content { grid-template-columns: 1fr; }
+            .form-row { grid-template-columns: 1fr; }
+            .product-detail, .contact-section, .cases-list, .solution-row { padding: 40px 20px; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+            .stat-number { font-size: 36px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar" id="navbar">
+        <div class="logo" onclick="navigate('home')">
+            <span class="i18n" data-zh="芯云智家" data-en="XinYun Smart Home">芯云智家</span>
+        </div>
+        <ul class="nav-links">
+            <li><a onclick="navigate('home')" class="nav-link active" data-page="home">
+                <span class="i18n" data-zh="首页" data-en="Home">首页</span>
+            </a></li>
+            <li><a onclick="navigate('products')" class="nav-link" data-page="products">
+                <span class="i18n" data-zh="产品中心" data-en="Product Center">产品中心</span>
+            </a></li>
+            <li><a onclick="navigate('solutions')" class="nav-link" data-page="solutions">
+                <span class="i18n" data-zh="解决方案" data-en="Solutions">解决方案</span>
+            </a></li>
+            <li><a onclick="navigate('cases')" class="nav-link" data-page="cases">
+                <span class="i18n" data-zh="案例展示" data-en="Case Studies">案例展示</span>
+            </a></li>
+            <li><a onclick="navigate('about')" class="nav-link" data-page="about">
+                <span class="i18n" data-zh="关于我们" data-en="About Us">关于我们</span>
+            </a></li>
+            <li><a onclick="navigate('contact')" class="nav-link" data-page="contact">
+                <span class="i18n" data-zh="联系我们" data-en="Contact Us">联系我们</span>
+            </a></li>
+        </ul>
+        <div class="nav-right">
+            <div class="lang-select" onclick="toggleLangDropdown(event)">
+                <span id="currentLangText">简体中文</span> ▾
+            </div>
+            <div class="lang-dropdown" id="langDropdown">
+                <div class="lang-option" onclick="switchLang('zh')">简体中文</div>
+                <div class="lang-option" onclick="switchLang('en')">English</div>
+            </div>
+            <button class="btn-primary" onclick="navigate('contact')">
+                <span class="i18n" data-zh="咨询合作" data-en="Inquire About Collaboration">咨询合作</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- ========== 首页 ========== -->
+    <div class="page active" id="page-home">
+        <section class="hero">
+            <div class="hero-grid"></div>
+            <div class="hero-content">
+                <h1>
+                    <span class="i18n" data-zh="远距离高清图传" data-en="Long-Range HD Video Transmission">远距离高清图传</span><br>
+                    <span class="i18n" style="background: linear-gradient(135deg, #4da3ff, #06b6d4); -webkit-background-clip: text; -webkit-text-fill-color: transparent;" data-zh="技术专家" data-en="Technical Expert">技术专家</span>
+                </h1>
+                <p class="i18n" data-zh="为无人机、无人车提供稳定可靠的实时图像传输解决方案" data-en="Stable, reliable real-time video transmission solutions for drones and autonomous vehicles">
+                    为无人机、无人车提供稳定可靠的实时图像传输解决方案
+                </p>
+                <div class="hero-buttons">
+                    <button class="btn-primary" onclick="navigate('products')">
+                        <span class="i18n" data-zh="了解产品" data-en="Learn about the product">了解产品</span>
+                    </button>
+                    <button class="hero-btn-white" onclick="navigate('contact')">
+                        <span class="i18n" data-zh="联系咨询" data-en="Contact Us">联系咨询</span>
+                    </button>
+                </div>
+            </div>
+            <div class="scroll-down" onclick="document.getElementById('home-features').scrollIntoView({behavior:'smooth'})">↓</div>
+        </section>
+
+        <section class="section section-white" id="home-features">
+            <div class="section-header">
+                <h2 class="i18n" data-zh="核心技术优势" data-en="Core Technical Advantages">核心技术优势</h2>
+                <p class="i18n" data-zh="自主研发的核心技术，为行业客户提供专业可靠的图传解决方案" data-en="Self-developed core technology provides professional and reliable video transmission solutions">
+                    自主研发的核心技术，为行业客户提供专业可靠的图传解决方案
+                </p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📡</div>
+                    <h3 class="i18n" data-zh="超远传输距离" data-en="Ultra-Long Range">超远传输距离</h3>
+                    <p class="i18n" data-zh="基于自研编码算法，实现百公里超远距离稳定传输" data-en="Self-developed coding algorithm enables stable transmission over hundreds of kilometers">
+                        基于自研编码算法，实现百公里超远距离稳定传输
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎬</div>
+                    <h3 class="i18n" data-zh="高清低延迟" data-en="HD & Low Latency">高清低延迟</h3>
+                    <p class="i18n" data-zh="支持 1080P/4K 高清画质，端到端延迟低至 50ms" data-en="Supports 1080P/4K HD quality with end-to-end latency as low as 50ms">
+                        支持 1080P/4K 高清画质，端到端延迟低至 50ms
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🛡️</div>
+                    <h3 class="i18n" data-zh="强抗干扰" data-en="Strong Anti-Interference">强抗干扰</h3>
+                    <p class="i18n" data-zh="自适应跳频技术，复杂电磁环境下依然稳定可靠" data-en="Adaptive frequency hopping ensures stability in complex environments">
+                        自适应跳频技术，复杂电磁环境下依然稳定可靠
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔌</div>
+                    <h3 class="i18n" data-zh="多平台兼容" data-en="Multi-Platform Support">多平台兼容</h3>
+                    <p class="i18n" data-zh="支持无人机、无人车等多种平台快速集成" data-en="Quick integration with drones, UGVs and other platforms">
+                        支持无人机、无人车等多种平台快速集成
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section section-dark">
+            <div class="section-header">
+                <h2 class="i18n" data-zh="产品中心" data-en="Product Center">产品中心</h2>
+                <p class="i18n" data-zh="全系列高清图传设备，满足不同应用场景需求" data-en="Full range of HD video transmission devices for various scenarios">
+                    全系列高清图传设备，满足不同应用场景需求
+                </p>
+            </div>
+            <div class="products-preview">
+                <div class="product-preview-card" onclick="navigate('products')">
+                    <div class="product-preview-img">XY-Z100</div>
+                    <div class="product-preview-info">
+                        <h3 class="i18n" data-zh="XY-Z100 专业版" data-en="XY-Z100 Professional">XY-Z100 专业版</h3>
+                        <div class="product-preview-stats">
+                            <div class="stat-mini"><div class="stat-mini-val">100km</div><div class="stat-mini-label i18n" data-zh="传输距离" data-en="Range">传输距离</div></div>
+                            <div class="stat-mini"><div class="stat-mini-val">≤50ms</div><div class="stat-mini-label i18n" data-zh="延迟" data-en="Latency">延迟</div></div>
+                            <div class="stat-mini"><div class="stat-mini-val">1080P</div><div class="stat-mini-label i18n" data-zh="分辨率" data-en="Resolution">分辨率</div></div>
+                        </div>
+                        <span style="color:#4da3ff;font-size:14px;" class="i18n" data-zh="查看详情 →" data-en="View Details →">查看详情 →</span>
+                    </div>
+                </div>
+                <div class="product-preview-card" onclick="navigate('products')">
+                    <div class="product-preview-img">XY-Z200</div>
+                    <div class="product-preview-info">
+                        <h3 class="i18n" data-zh="XY-Z200 增强版" data-en="XY-Z200 Enhanced">XY-Z200 增强版</h3>
+                        <div class="product-preview-stats">
+                            <div class="stat-mini"><div class="stat-mini-val">200km</div><div class="stat-mini-label i18n" data-zh="传输距离" data-en="Range">传输距离</div></div>
+                            <div class="stat-mini"><div class="stat-mini-val">≤30ms</div><div class="stat-mini-label i18n" data-zh="延迟" data-en="Latency">延迟</div></div>
+                            <div class="stat-mini"><div class="stat-mini-val">4K</div><div class="stat-mini-label i18n" data-zh="分辨率" data-en="Resolution">分辨率</div></div>
+                        </div>
+                        <span style="color:#4da3ff;font-size:14px;" class="i18n" data-zh="查看详情 →" data-en="View Details →">查看详情 →</span>
+                    </div>
+                </div>
+                <div class="product-preview-card" onclick="navigate('products')">
+                    <div class="product-preview-img">XY-Z300</div>
+                    <div class="product-preview-info">
+                        <h3 class="i18n" data-zh="XY-Z300 旗舰版" data-en="XY-Z300 Flagship">XY-Z300 旗舰版</h3>
+                        <div class="product-preview-stats">
+                            <div class="stat-mini"><div class="stat-mini-val">300km+</div><div class="stat-mini-label i18n" data-zh="传输距离" data-en="Range">传输距离</div></div>
+                            <div class="stat-mini"><div class="stat-mini-val">≤20ms</div><div class="stat-mini-label i18n" data-zh="延迟" data-en="Latency">延迟</div></div>
+                            <div class="stat-mini"><div class="stat-mini-val">4K HDR</div><div class="stat-mini-label i18n" data-zh="分辨率" data-en="Resolution">分辨率</div></div>
+                        </div>
+                        <span style="color:#4da3ff;font-size:14px;" class="i18n" data-zh="查看详情 →" data-en="View Details →">查看详情 →</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="stats-section">
+            <div class="section-header">
+                <h2 class="i18n" data-zh="值得信赖的选择" data-en="A Trusted Choice">值得信赖的选择</h2>
+                <p class="i18n" data-zh="已服务众多行业客户，积累丰富实战经验" data-en="Served numerous industry clients with rich practical experience">
+                    已服务众多行业客户，积累丰富实战经验
+                </p>
+            </div>
+            <div class="stats-grid">
+                <div><div class="stat-number">500+</div><div class="stat-label i18n" data-zh="服务客户" data-en="Clients Served">服务客户</div></div>
+                <div><div class="stat-number">300km</div><div class="stat-label i18n" data-zh="最远传输" data-en="Max Range">最远传输</div></div>
+                <div><div class="stat-number">99.9%</div><div class="stat-label i18n" data-zh="稳定性" data-en="Stability">稳定性</div></div>
+                <div><div class="stat-number">50+</div><div class="stat-label i18n" data-zh="专利技术" data-en="Patents">专利技术</div></div>
+            </div>
+        </section>
+
+        <section class="cta-section">
+            <h2 class="i18n" data-zh="准备好开始合作了吗？" data-en="Ready to Start Collaborating?">准备好开始合作了吗？</h2>
+            <p class="i18n" data-zh="立即联系我们，获取专属解决方案和报价" data-en="Contact us now for customized solutions and quotes">
+                立即联系我们，获取专属解决方案和报价
+            </p>
+            <div class="cta-buttons">
+                <button class="btn-primary" onclick="navigate('contact')">
+                    <span class="i18n" data-zh="立即咨询" data-en="Inquire Now">立即咨询</span>
+                </button>
+                <button class="hero-btn-white" onclick="navigate('products')">
+                    <span class="i18n" data-zh="查看产品" data-en="View Products">查看产品</span>
+                </button>
+            </div>
+        </section>
+    </div>
+
+    <!-- ========== 产品中心页 ========== -->
+    <div class="page" id="page-products">
+        <div class="page-banner">
+            <h1 class="i18n" data-zh="产品中心" data-en="Product Center">产品中心</h1>
+            <p class="i18n" data-zh="全系列高清图传设备，为不同应用场景提供专业可靠的传输解决方案" data-en="Full range of HD video transmission devices for various scenarios">
+                全系列高清图传设备，为不同应用场景提供专业可靠的传输解决方案
+            </p>
+        </div>
+
+        <div class="product-detail">
+            <div class="product-detail-img">XY-Z100</div>
+            <div class="product-detail-info">
+                <h2 class="i18n" data-zh="XY-Z100 专业版" data-en="XY-Z100 Professional">XY-Z100 专业版</h2>
+                <p class="subtitle i18n" data-zh="入门级专业图传设备，适合短距离应用场景" data-en="Entry-level professional device for short-range applications">
+                    入门级专业图传设备，适合短距离应用场景
+                </p>
+                <div class="params-card">
+                    <h4 class="i18n" data-zh="技术参数" data-en="Technical Specifications">技术参数</h4>
+                    <div class="param-item"><span class="param-check">✓</span><span class="i18n" data-zh="传输距离：100km" data-en="Range: 100km">传输距离：100km</span></div>
+                    <div class="param-item"><span class="param-check">✓</span><span class="i18n" data-zh="延迟：≤50ms" data-en="Latency: ≤50ms">延迟：≤50ms</span></div>
+                    <div class="param-item"><span class="param-check">✓</span><span class="i18n" data-zh="分辨率：1080P@60fps" data-en="Resolution: 1080P@60fps">分辨率：1080P@60fps</span></div>
+                    <div class="param-item"><span class="param-check">✓</span><span class="i18n" data-zh="工作频段：2.4GHz/5.8GHz" data-en="Frequency: 2.4GHz/5.8GHz">工作频段：2.4GHz/5.8GHz</span></div>
+                    <div class="param-item"><span class="param-check">✓</span><span class="i18n" data-zh="重量：280g" data-en="Weight: 280g">重量：280g</span></div>
+                    <div class="param-item"><span class="param-check">✓</span><span class="i18n" data-zh="功耗：8W" data-en="Power: 8W">功耗：8W</span></div>
+                </div>
+                <h4 style="margin-bottom:15px;" class="i18n" data-zh="适用场景" data-en="Applications">适用场景</h4>
+                <div class="scene-tags">
+                    <span class="scene-tag i18n" data-zh="小型无人机" data-en="Small Drones">小型无人机</span>
+                    <span class="scene-tag i18n" data-zh="地面机器人" data-en="Ground Robots">地面机器人</span>
+                    <span class="scene-tag i18n" data-zh="手持设备" data-en="Handheld Devices">手持设备</span>
+                </div>
+                <div class="product-buttons">
+                    <button class="btn-outline i18n" data-zh="查看详情" data-en="View Details">查看详情</button>
+                    <button class="btn-primary" onclick="navigate('contact')">
+                        <span class="i18n" data-zh="咨询报价" data-en="Get Quote">咨询报价</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="product-detail alt">
+            <div class="product-detail-img">XY-Z200</div>
+            <div class="product-detail-info">
+                <h2 class="i18n" data-zh="XY-Z200 增强版" data-en="XY-Z200 Enhanced">XY-Z200 增强版</h2>
+                <p class="subtitle i18n" data-zh="高性能图传设备，支持更远距离和更高画质" data-en="High-performance device for longer range and better quality">
+                    高性能图传设备，支持更远距离和更高画质
+                </p>
+                <div class="params-card">
+                    <h4 class="i18n" data-zh="技术参数" data-en="Technical Specifications">技术参数</h4>
+                    <div class="param-item"><span class="param-check">✓</span><span class="i18n" data-zh="传输距离：200km" data-en="Range: 200km">传输距离：200km</span></div>
+                    <div class="param-item"><span class="param-check">✓</span><span class="i18n" data-zh="延迟：≤30ms" data-en="Latency: ≤30ms">延迟：≤30ms</span></div>
+                    <div class="param-item"><span class="param-check">✓</span><span class="i18n" data-zh="分辨率：4K@30fps" data-en="Resolution: 4K@30fps">分辨率：4K@30fps</span></div>
+                    <div class="param-item"><span class="param-check">✓</span><span class="i18n" data-zh="工作频段：2.4GHz/5.8GHz/900MHz" data-en="Frequency: 2.4GHz/5.8GHz/900MHz">工作频段：2.4GHz/5.8GHz/900MHz</span></div>
+                    <div class="param-item"><span class="param-check">✓</span><span class="i18n" data-zh="重量：350g" data-en="Weight: 350g">重量：350g</span></div>
+                    <div class="param-item"><span class="param-check">✓</span><span class="i18n" data-zh="功耗：12W" data-en="Power: 12W">功耗：12W</span></div>
+                </div>
+                <h4 style="margin-bottom:15px;" class="i18n" data-zh="适用场景" data-en="Applications">适用场景</h4>
+                <div class="scene-tags">
+                    <span class="scene-tag i18n" data-zh="中型无人机" data-en="Medium Drones">中型无人机</span>
+                    <span class="scene-tag i18n" data-zh="无人车" data-en="UGVs">无人车</span>
+                    <span class="scene-tag i18n" data-zh="长航时飞行器" data-en="Long-Endurance Aircraft">长航时飞行器</span>
+                </div>
+                <div class="product-buttons">
+                    <button class="btn-outline i18n" data-zh="查看详情" data-en="View Details">查看详情</button>
+                    <button class="btn-primary" onclick="navigate('contact')">
+                        <span class="i18n" data-zh="咨询报价" data-en="Get Quote">咨询报价</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="product-detail">
+            <div class="product-detail-img">XY-Z300</div>
+            <div class="product-detail-info">
+                <h2 class="i18n" data-zh="XY-Z300 旗舰版" data-en="XY-Z300 Flagship">XY-Z300 旗舰版</h2>
+                <p class="subtitle i18n" data-zh="旗舰级图传系统，满足极端环境下的专业需求" data-en="Flagship system for professional needs in extreme environments">
+                    旗舰级图传系统，满足极端环境下的专业需求
+                </p>
+                <div class="params-card">
+                    <h4 class="i18n" data-zh="技术参数" data-en="Technical Specifications">技术参数</h4>
+                    <div class="param-item"><span class="param-check">✓</span><span class="i18n" data-zh="传输距离：300km+" data-en="Range: 300km+">传输距离：300km+</span></div>
+                    <div class="param-item"><span class="param-check">✓</span><span class="i18n" data-zh="延迟：≤20ms" data-en="Latency: ≤20ms">延迟：≤20ms</span></div>
+                    <div class="param-item"><span class="param-check">✓</span><span class="i18n" data-zh="分辨率：4K HDR@60fps" data-en="Resolution: 4K HDR@60fps">分辨率：4K HDR@60fps</span></div>
+                    <div class="param-item"><span class="param-check">✓</span><span class="i18n" data-zh="工作频段：全频段支持" data-en="Frequency: Full band support">工作频段：全频段支持</span></div>
+                    <div class="param-item"><span class="param-check">✓</span><span class="i18n" data-zh="重量：420g" data-en="Weight: 420g">重量：420g</span></div>
+                    <div class="param-item"><span class="param-check">✓</span><span class="i18n" data-zh="功耗：15W" data-en="Power: 15W">功耗：15W</span></div>
+                    <div class="param-item"><span class="param-check">✓</span><span class="i18n" data-zh="防护等级：IP67" data-en="Protection: IP67">防护等级：IP67</span></div>
+                </div>
+                <h4 style="margin-bottom:15px;" class="i18n" data-zh="适用场景" data-en="Applications">适用场景</h4>
+                <div class="scene-tags">
+                    <span class="scene-tag i18n" data-zh="大型无人机" data-en="Large Drones">大型无人机</span>
+                    <span class="scene-tag i18n" data-zh="特种应用" data-en="Special Applications">特种应用</span>
+                    <span class="scene-tag i18n" data-zh="边防监控" data-en="Border Surveillance">边防监控</span>
+                </div>
+                <div class="product-buttons">
+                    <button class="btn-outline i18n" data-zh="查看详情" data-en="View Details">查看详情</button>
+                    <button class="btn-primary" onclick="navigate('contact')">
+                        <span class="i18n" data-zh="咨询报价" data-en="Get Quote">咨询报价</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <section class="cta-section">
+            <h2 class="i18n" data-zh="需要定制化方案？" data-en="Need a Custom Solution?">需要定制化方案？</h2>
+            <p class="i18n" data-zh="我们可以根据您的具体需求提供定制化产品和服务" data-en="We provide customized products and services based on your specific needs">
+                我们可以根据您的具体需求提供定制化产品和服务
+            </p>
+            <div class="cta-buttons">
+                <button class="btn-primary" onclick="navigate('contact')">
+                    <span class="i18n" data-zh="联系我们" data-en="Contact Us">联系我们</span>
+                </button>
+            </div>
+        </section>
+    </div>
+
+    <!-- ========== 解决方案页 ========== -->
+    <div class="page" id="page-solutions">
+        <div class="page-banner">
+            <h1 class="i18n" data-zh="解决方案" data-en="Solutions">解决方案</h1>
+            <p class="i18n" data-zh="针对不同行业场景的定制化图传解决方案" data-en="Customized video transmission solutions for different industries">
+                针对不同行业场景的定制化图传解决方案
+            </p>
+        </div>
+
+        <div class="solution-row">
+            <div class="solution-features">
+                <div class="solution-feature-item"><div class="feature-check-icon">✓</div><span class="i18n" data-zh="超远距离稳定传输" data-en="Ultra-long range stable transmission">超远距离稳定传输</span></div>
+                <div class="solution-feature-item"><div class="feature-check-icon">✓</div><span class="i18n" data-zh="高清低延迟画质" data-en="HD low-latency video">高清低延迟画质</span></div>
+                <div class="solution-feature-item"><div class="feature-check-icon">✓</div><span class="i18n" data-zh="强抗干扰能力" data-en="Strong anti-interference">强抗干扰能力</span></div>
+                <div class="solution-feature-item"><div class="feature-check-icon">✓</div><span class="i18n" data-zh="自适应跳频" data-en="Adaptive frequency hopping">自适应跳频</span></div>
+                <div class="solution-feature-item"><div class="feature-check-icon">✓</div><span class="i18n" data-zh="复杂环境稳定工作" data-en="Stable in complex environments">复杂环境稳定工作</span></div>
+                <div class="solution-feature-item"><div class="feature-check-icon">✓</div><span class="i18n" data-zh="快速集成接口" data-en="Quick integration interface">快速集成接口</span></div>
+                <div class="solution-feature-item"><div class="feature-check-icon">✓</div><span class="i18n" data-zh="24小时技术支持" data-en="24/7 technical support">24小时技术支持</span></div>
+            </div>
+            <div class="solution-img i18n" data-zh="无人机图传方案" data-en="Drone Solution">无人机图传方案</div>
+        </div>
+
+        <div class="solution-row alt">
+            <div class="solution-img i18n" data-zh="无人车图传方案" data-en="UGV Solution">无人车图传方案</div>
+            <div class="solution-features">
+                <div class="solution-feature-item"><div class="feature-check-icon">✓</div><span class="i18n" data-zh="地面移动传输优化" data-en="Optimized for ground mobility">地面移动传输优化</span></div>
+                <div class="solution-feature-item"><div class="feature-check-icon">✓</div><span class="i18n" data-zh="遮挡环境信号增强" data-en="Signal boost in obstructed areas">遮挡环境信号增强</span></div>
+                <div class="solution-feature-item"><div class="feature-check-icon">✓</div><span class="i18n" data-zh="多链路冗余备份" data-en="Multi-link redundancy">多链路冗余备份</span></div>
+                <div class="solution-feature-item"><div class="feature-check-icon">✓</div><span class="i18n" data-zh="支持多种车载协议" data-en="Multiple vehicle protocols">支持多种车载协议</span></div>
+                <div class="solution-feature-item"><div class="feature-check-icon">✓</div><span class="i18n" data-zh="工业级防护标准" data-en="Industrial-grade protection">工业级防护标准</span></div>
+                <div class="solution-feature-item"><div class="feature-check-icon">✓</div><span class="i18n" data-zh="宽温工作范围" data-en="Wide temperature range">宽温工作范围</span></div>
+            </div>
+        </div>
+
+        <div class="solution-row">
+            <div class="solution-features">
+                <div class="solution-feature-item"><div class="feature-check-icon">✓</div><span class="i18n" data-zh="极端环境适应性" data-en="Extreme environment adaptability">极端环境适应性</span></div>
+                <div class="solution-feature-item"><div class="feature-check-icon">✓</div><span class="i18n" data-zh="加密安全传输" data-en="Encrypted secure transmission">加密安全传输</span></div>
+                <div class="solution-feature-item"><div class="feature-check-icon">✓</div><span class="i18n" data-zh="全天候不间断运行" data-en="24/7 uninterrupted operation">全天候不间断运行</span></div>
+                <div class="solution-feature-item"><div class="feature-check-icon">✓</div><span class="i18n" data-zh="多节点组网能力" data-en="Multi-node networking">多节点组网能力</span></div>
+                <div class="solution-feature-item"><div class="feature-check-icon">✓</div><span class="i18n" data-zh="定制化开发支持" data-en="Custom development support">定制化开发支持</span></div>
+                <div class="solution-feature-item"><div class="feature-check-icon">✓</div><span class="i18n" data-zh="军工级品质标准" data-en="Military-grade quality">军工级品质标准</span></div>
+            </div>
+            <div class="solution-img i18n" data-zh="特种应用方案" data-en="Special Applications">特种应用方案</div>
+        </div>
+    </div>
+
+    <!-- ========== 案例展示页 ========== -->
+    <div class="page" id="page-cases">
+        <div class="page-banner">
+            <h1 class="i18n" data-zh="案例展示" data-en="Case Studies">案例展示</h1>
+            <p class="i18n" data-zh="已服务众多行业客户，积累丰富实战经验" data-en="Served numerous industry clients with rich practical experience">
+                已服务众多行业客户，积累丰富实战经验
+            </p>
+        </div>
+
+        <div class="cases-list">
+            <div class="case-card">
+                <div>
+                    <span class="case-tag i18n" data-zh="城市巡检" data-en="Urban Inspection">城市巡检</span>
+                    <p class="case-client i18n" data-zh="客户：某市政巡检部门" data-en="Client: Municipal Inspection Department">客户：某市政巡检部门</p>
+                    <h3 class="i18n" data-zh="城市道路无人机巡检项目" data-en="Urban Road Drone Inspection Project">城市道路无人机巡检项目</h3>
+                    <div class="case-section">
+                        <h4 class="i18n" data-zh="面临挑战" data-en="Challenges">面临挑战</h4>
+                        <p class="i18n" data-zh="城市环境复杂，高楼遮挡严重，对图传稳定性和抗干扰能力要求极高。" data-en="Complex urban environment with building obstruction requires high stability and anti-interference.">
+                            城市环境复杂，高楼遮挡严重，对图传稳定性和抗干扰能力要求极高。
+                        </p>
+                    </div>
+                    <div class="case-section">
+                        <h4 class="i18n" data-zh="解决方案" data-en="Solution">解决方案</h4>
+                        <p class="i18n" data-zh="部署XY-Z200设备，配合多频段自适应跳频技术，优化城市传输链路。" data-en="Deployed XY-Z200 with multi-band adaptive frequency hopping for optimized urban links.">
+                            部署XY-Z200设备，配合多频段自适应跳频技术，优化城市传输链路。
+                        </p>
+                    </div>
+                    <div class="case-result">
+                        <div class="case-result-item">✓ <span class="i18n" data-zh="城市道路时速60km/h稳定传输" data-en="Stable transmission at 60km/h on urban roads">城市道路时速60km/h稳定传输</span></div>
+                        <div class="case-result-item">✓ <span class="i18n" data-zh="多路1080P视频并发回传" data-en="Multiple 1080P video streams simultaneously">多路1080P视频并发回传</span></div>
+                        <div class="case-result-item">✓ <span class="i18n" data-zh="系统可用性达99.9%" data-en="99.9% system availability">系统可用性达99.9%</span></div>
+                    </div>
+                    <br>
+                    <span class="case-link i18n" data-zh="查看详情 →" data-en="View Details →">查看详情 →</span>
+                </div>
+                <div class="case-img i18n" data-zh="城市巡检" data-en="Urban Inspection">城市巡检</div>
+            </div>
+
+            <div class="case-card">
+                <div class="case-img i18n" data-zh="极地科考" data-en="Polar Research">极地科考</div>
+                <div>
+                    <span class="case-tag i18n" data-zh="科学研究" data-en="Scientific Research">科学研究</span>
+                    <p class="case-client i18n" data-zh="客户：国家级科研机构" data-en="Client: National Research Institute">客户：国家级科研机构</p>
+                    <h3 class="i18n" data-zh="某科研机构极地科考项目" data-en="Polar Research Project">某科研机构极地科考项目</h3>
+                    <div class="case-section">
+                        <h4 class="i18n" data-zh="面临挑战" data-en="Challenges">面临挑战</h4>
+                        <p class="i18n" data-zh="极地环境极端恶劣，低温、强风、冰雪覆盖，对设备可靠性和传输稳定性提出极高要求。" data-en="Extreme polar environment with low temperature and strong winds requires high reliability.">
+                            极地环境极端恶劣，低温、强风、冰雪覆盖，对设备可靠性和传输稳定性提出极高要求。
+                        </p>
+                    </div>
+                    <div class="case-section">
+                        <h4 class="i18n" data-zh="解决方案" data-en="Solution">解决方案</h4>
+                        <p class="i18n" data-zh="定制加固版XY-Z300设备，增加低温保护模块，支持-50°C极寒环境正常工作。" data-en="Custom rugged XY-Z300 with low-temperature protection for -50°C operation.">
+                            定制加固版XY-Z300设备，增加低温保护模块，支持-50°C极寒环境正常工作。
+                        </p>
+                    </div>
+                    <div class="case-result">
+                        <div class="case-result-item">✓ <span class="i18n" data-zh="-45°C环境下稳定运行" data-en="Stable operation at -45°C">-45°C环境下稳定运行</span></div>
+                        <div class="case-result-item">✓ <span class="i18n" data-zh="连续工作90天无故障" data-en="90 days continuous operation without failure">连续工作90天无故障</span></div>
+                        <div class="case-result-item">✓ <span class="i18n" data-zh="传输距离突破280km" data-en="Transmission range over 280km">传输距离突破280km</span></div>
+                        <div class="case-result-item">✓ <span class="i18n" data-zh="获得科考队高度评价" data-en="Highly praised by research team">获得科考队高度评价</span></div>
+                    </div>
+                    <br>
+                    <span class="case-link i18n" data-zh="查看详情 →" data-en="View Details →">查看详情 →</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== 关于我们页 ========== -->
+    <div class="page" id="page-about">
+        <div class="page-banner">
+            <h1 class="i18n" data-zh="关于我们" data-en="About Us">关于我们</h1>
+            <p class="i18n" data-zh="专注远距离高清图传技术研发，致力于成为行业领先的通信解决方案提供商" data-en="Focused on HD video transmission R&D, striving to be the leading communication solution provider">
+                专注远距离高清图传技术研发，致力于成为行业领先的通信解决方案提供商
+            </p>
+        </div>
+
+        <div class="about-stats">
+            <div class="about-stat-card">
+                <div class="about-stat-num">100+</div>
+                <div class="about-stat-label i18n" data-zh="研发人员" data-en="R&D Personnel">研发人员</div>
+            </div>
+            <div class="about-stat-card">
+                <div class="about-stat-num">20+</div>
+                <div class="about-stat-label i18n" data-zh="认证资质" data-en="Certifications">认证资质</div>
+            </div>
+            <div class="about-stat-card">
+                <div class="about-stat-num">50+</div>
+                <div class="about-stat-label i18n" data-zh="专利技术" data-en="Patents">专利技术</div>
+            </div>
+            <div class="about-stat-card">
+                <div class="about-stat-num">10+</div>
+                <div class="about-stat-label i18n" data-zh="荣誉资质" data-en="Honors">荣誉资质</div>
+            </div>
+        </div>
+
+        <div class="timeline-section">
+            <div class="section-header">
+                <h2 class="i18n" data-zh="发展历程" data-en="Development History">发展历程</h2>
+                <p class="i18n" data-zh="从技术突破到行业领先，每一步都凝聚着创新与坚持" data-en="From breakthrough to industry leadership, every step is innovation and persistence">
+                    从技术突破到行业领先，每一步都凝聚着创新与坚持
+                </p>
+            </div>
+            <div class="timeline">
+                <div class="timeline-item left">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-card">
+                        <div class="timeline-year">2018</div>
+                        <div class="timeline-title i18n" data-zh="公司成立" data-en="Company Founded">公司成立</div>
+                        <div class="timeline-desc i18n" data-zh="芯云智家在北京成立，专注于远距离图传技术研发" data-en="Founded in Beijing, focused on long-range video transmission R&D">芯云智家在北京成立，专注于远距离图传技术研发</div>
+                    </div>
+                </div>
+                <div class="timeline-item right">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-card">
+                        <div class="timeline-year">2019</div>
+                        <div class="timeline-title i18n" data-zh="技术突破" data-en="Tech Breakthrough">技术突破</div>
+                        <div class="timeline-desc i18n" data-zh="自主研发编码算法，实现百公里图传技术突破" data-en="Self-developed coding algorithm achieved 100km video transmission breakthrough">自主研发编码算法，实现百公里图传技术突破</div>
+                    </div>
+                </div>
+                <div class="timeline-item left">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-card">
+                        <div class="timeline-year">2020</div>
+                        <div class="timeline-title i18n" data-zh="市场拓展" data-en="Market Expansion">市场拓展</div>
+                        <div class="timeline-desc i18n" data-zh="产品进入无人机、安防等多个行业领域" data-en="Products entered drones, security and other industry sectors">产品进入无人机、安防等多个行业领域</div>
+                    </div>
+                </div>
+                <div class="timeline-item right">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-card">
+                        <div class="timeline-year">2022</div>
+                        <div class="timeline-title i18n" data-zh="产品线完善" data-en="Product Line Complete">产品线完善</div>
+                        <div class="timeline-desc i18n" data-zh="形成Z100/Z200/Z300全系列产品矩阵" data-en="Formed complete Z100/Z200/Z300 product matrix">形成Z100/Z200/Z300全系列产品矩阵</div>
+                    </div>
+                </div>
+                <div class="timeline-item left">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-card">
+                        <div class="timeline-year">2024</div>
+                        <div class="timeline-title i18n" data-zh="国际化布局" data-en="Global Expansion">国际化布局</div>
+                        <div class="timeline-desc i18n" data-zh="产品出口全球30+国家，建立海外服务网络" data-en="Products exported to 30+ countries, established overseas service network">产品出口全球30+国家，建立海外服务网络</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== 联系我们页 ========== -->
+    <div class="page" id="page-contact">
+        <div class="page-banner">
+            <h1 class="i18n" data-zh="联系我们" data-en="Contact Us">联系我们</h1>
+            <p class="i18n" data-zh="期待与您合作，共同推动行业发展" data-en="Looking forward to collaborating with you">期待与您合作，共同推动行业发展</p>
+        </div>
+
+        <div class="contact-section">
+            <div>
+                <div class="contact-info-card">
+                    <div class="contact-icon">📞</div>
+                    <div>
+                        <div class="contact-info-label i18n" data-zh="服务热线" data-en="Service Hotline">服务热线</div>
+                        <div class="contact-info-value">400-XXX-XXXX</div>
+                    </div>
+                </div>
+                <div class="contact-info-card">
+                    <div class="contact-icon">✉️</div>
+                    <div>
+                        <div class="contact-info-label i18n" data-zh="商务邮箱" data-en="Business Email">商务邮箱</div>
+                        <div class="contact-info-value">info@xinyunzhijia.com</div>
+                    </div>
+                </div>
+                <div class="contact-info-card">
+                    <div class="contact-icon">🕐</div>
+                    <div>
+                        <div class="contact-info-label i18n" data-zh="工作时间" data-en="Working Hours">工作时间</div>
+                        <div class="contact-info-value i18n" data-zh="周一至周五 9:00-18:00" data-en="Mon-Fri 9:00-18:00">周一至周五 9:00-18:00</div>
+                    </div>
+                </div>
+                <div class="wechat-card">
+                    <div class="wechat-qr">💬</div>
+                    <p class="i18n" data-zh="扫描二维码关注官方微信" data-en="Scan QR code to follow official WeChat">扫描二维码关注官方微信</p>
+                </div>
+            </div>
+
+            <div class="contact-form">
+                <div class="form-group">
+                    <label><span class="i18n" data-zh="您的姓名" data-en="Your Name">您的姓名</span> <span class="required">*</span></label>
+                    <input type="text" class="form-input" placeholder="">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><span class="i18n" data-zh="联系电话" data-en="Phone">联系电话</span> <span class="required">*</span></label>
+                        <input type="text" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label><span class="i18n" data-zh="电子邮箱" data-en="Email">电子邮箱</span></label>
+                        <input type="email" class="form-input">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label><span class="i18n" data-zh="公司名称" data-en="Company">公司名称</span></label>
+                    <input type="text" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label><span class="i18n" data-zh="需求描述" data-en="Requirements">需求描述</span> <span class="required">*</span></label>
+                    <textarea class="form-textarea" placeholder=""></textarea>
+                </div>
+                <button class="submit-btn" onclick="submitForm()">
+                    <span class="i18n" data-zh="提交需求" data-en="Submit Request">提交需求</span>
+                </button>
+                <p class="form-tip i18n" data-zh="提交即表示您同意我们的隐私政策，我们承诺保护您的个人信息安全。" data-en="By submitting, you agree to our privacy policy. We protect your personal information.">
+                    提交即表示您同意我们的隐私政策，我们承诺保护您的个人信息安全。
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== 页脚 ========== -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div>
+                <div class="footer-logo i18n" data-zh="芯云智家" data-en="XinYun Smart Home">芯云智家</div>
+                <p class="footer-desc i18n" data-zh="远距离高清图传技术专家，为无人机、无人车提供稳定可靠的实时图像传输解决方案。" data-en="Long-range HD video transmission expert, providing stable real-time video solutions.">
+                    远距离高清图传技术专家，为无人机、无人车提供稳定可靠的实时图像传输解决方案。
+                </p>
+            </div>
+            <div class="footer-col">
+                <h4 class="i18n" data-zh="快速链接" data-en="Quick Links">快速链接</h4>
+                <ul>
+                    <li><a onclick="navigate('products')"><span class="i18n" data-zh="产品中心" data-en="Product Center">产品中心</span></a></li>
+                    <li><a onclick="navigate('solutions')"><span class="i18n" data-zh="解决方案" data-en="Solutions">解决方案</span></a></li>
+                    <li><a onclick="navigate('cases')"><span class="i18n" data-zh="案例展示" data-en="Case Studies">案例展示</span></a></li>
+                    <li><a onclick="navigate('about')"><span class="i18n" data-zh="关于我们" data-en="About Us">关于我们</span></a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4 class="i18n" data-zh="联系方式" data-en="Contact">联系方式</h4>
+                <div class="footer-contact-item">📞 400-XXX-XXXX</div>
+                <div class="footer-contact-item">✉️ info@xinyunzhijia.com</div>
+                <div class="footer-contact-item">📍 <span class="i18n" data-zh="北京市海淀区中关村科技园" data-en="Zhongguancun Science Park, Haidian, Beijing">北京市海淀区中关村科技园</span></div>
+            </div>
+            <div class="footer-col">
+                <h4 class="i18n" data-zh="关注我们" data-en="Follow Us">关注我们</h4>
+                <div class="social-icons">
+                    <div class="social-icon">微</div>
+                    <div class="social-icon">博</div>
+                    <div class="social-icon">领</div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div>© 2026 <span class="i18n" data-zh="芯云智家。保留所有权利。" data-en="XinYun Smart Home. All rights reserved.">芯云智家。保留所有权利。</span></div>
+            <div class="footer-icp i18n" data-zh="京 ICP 备 XXXXXXXX 号" data-en="ICP Registration: XXXXXXXX">京 ICP 备 XXXXXXXX 号</div>
+        </div>
+    </footer>
+
+    <script>
+        // 当前语言
+        let currentLang = 'zh';
+
+        // 页面路由切换
+        function navigate(pageName) {
+            // 隐藏所有页面
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            // 显示目标页面
+            const target = document.getElementById('page-' + pageName);
+            if (target) target.classList.add('active');
+            // 更新导航高亮
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+                if (link.dataset.page === pageName) link.classList.add('active');
+            });
+            // 滚到顶部
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            // 关闭语言下拉
+            document.getElementById('langDropdown').classList.remove('show');
+        }
+
+        // 语言下拉切换
+        function toggleLangDropdown(e) {
+            e.stopPropagation();
+            document.getElementById('langDropdown').classList.toggle('show');
+        }
+
+        // 点击外部关闭下拉
+        document.addEventListener('click', function() {
+            document.getElementById('langDropdown').classList.remove('show');
+        });
+
+        // 切换语言
+        function switchLang(lang) {
+            currentLang = lang;
+            const langText = document.getElementById('currentLangText');
+            langText.textContent = lang === 'zh' ? '简体中文' : 'English';
+
+            // 遍历所有带 i18n class 的元素切换文本
+            document.querySelectorAll('.i18n').forEach(el => {
+                const zh = el.dataset.zh;
+                const en = el.dataset.en;
+                if (zh && en) {
+                    el.textContent = lang === 'zh' ? zh : en;
+                }
+            });
+
+            // 更新HTML lang属性
+            document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+
+            // 更新页面标题
+            document.title = lang === 'zh'
+                ? '芯云智家 - 远距离高清图传技术专家'
+                : 'XinYun Smart Home - Long-Range HD Video Transmission Expert';
+
+            // 关闭下拉
+            document.getElementById('langDropdown').classList.remove('show');
+        }
+
+        // 导航栏滚动效果
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // 表单提交
+        function submitForm() {
+            const msg = currentLang === 'zh'
+                ? '需求已提交，我们会尽快与您联系！'
+                : 'Request submitted! We will contact you soon!';
+            alert(msg);
+        }
+
+        // 滚动渐入动画
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+        // 页面加载完成后初始化动画元素
+        window.addEventListener('load', function() {
+            document.querySelectorAll('.feature-card, .product-preview-card, .about-stat-card, .case-card, .timeline-card').forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(30px)';
+                el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(el);
+            });
+        });
+    </script>
+</body>
+</html>
