@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>产品详情 - 芯云智家</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap">
+  <style>
+    .detail-page { max-width: 1400px; margin: 0 auto; padding: 100px 24px 80px; position: relative; }
+    /* 详情页顶部为白色背景，导航栏默认白底黑字 */
+    .navbar { background: #fff; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+    .navbar .nav-link { color: #475569; }
+    .navbar .logo-text { color: #1e293b; }
+    .navbar .nav-link.active { color: #2563eb; }
+    .detail-back { display: inline-flex; align-items: center; gap: 8px; color: var(--gray-500); text-decoration: none; font-size: 14px; margin-bottom: 24px; cursor: pointer; }
+    .detail-back:hover { color: var(--primary-600); }
+    .detail-hero { display: grid; grid-template-columns: 2fr 1fr; gap: 40px; margin-bottom: 40px; align-items: start; }
+    .detail-image { aspect-ratio: 4/3; border-radius: 16px; overflow: hidden; background: linear-gradient(135deg, #eff6ff, #e0f2fe); display: flex; align-items: center; justify-content: center; }
+    .detail-image img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .gallery-wrapper { display: flex; align-items: center; gap: 20px; margin-bottom: 12px; }
+    .gallery-main { flex: 1; min-width: 0; width: 100%; aspect-ratio: 4/3; border-radius: 16px; overflow: hidden; background: linear-gradient(135deg, #eff6ff, #e0f2fe); display: flex; align-items: center; justify-content: center; }
+    .gallery-main img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .gallery-thumbs { display: flex; gap: 10px; }
+    .gallery-thumb { width: 80px; height: 60px; border-radius: 8px; overflow: hidden; background: #f1f5f9; cursor: pointer; border: 2px solid transparent; transition: border-color 0.2s; display: flex; align-items: center; justify-content: center; }
+    .gallery-thumb img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .gallery-thumb.active { border-color: var(--primary-600, #2563eb); }
+    .gallery-nav { position: static; transform: none; width: 56px; height: 56px; border-radius: 50%; background: #fff; border: 2px solid #e2e8f0; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: all 0.2s; flex-shrink: 0; }
+    .gallery-nav:hover { background: #2563eb; border-color: #2563eb; }
+    .gallery-nav:hover svg { stroke: #fff; }
+    .gallery-nav svg { width: 24px; height: 24px; stroke: #475569; transition: stroke 0.2s; }
+    .lightbox-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fff; z-index: 9999; display: none; align-items: center; justify-content: center; cursor: zoom-out; }
+    .lightbox-overlay.open { display: flex; }
+    .lightbox-img { max-width: 90vw; max-height: 90vh; object-fit: contain; transition: transform 0.1s; cursor: grab; user-select: none; -webkit-user-drag: none; }
+    .lightbox-img.dragging { cursor: grabbing; }
+    .lightbox-close { position: absolute; top: 20px; right: 24px; width: 44px; height: 44px; border-radius: 50%; background: rgba(0,0,0,0.08); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #1a1a1a; font-size: 24px; }
+    .lightbox-close:hover { background: rgba(0,0,0,0.15); }
+    .lightbox-hint { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); color: rgba(0,0,0,0.5); font-size: 13px; }
+    .detail-info h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; color: var(--gray-900); }
+    .detail-tagline { font-size: 16px; color: var(--gray-500); margin-bottom: 24px; line-height: 1.6; }
+    .detail-features h4 { font-size: 16px; font-weight: 600; margin-bottom: 12px; color: var(--gray-900); }
+    .feature-list { display: flex; flex-direction: column; gap: 10px; }
+    .feature-item { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; color: var(--gray-600); line-height: 1.6; }
+    .feature-check { color: var(--primary-600); flex-shrink: 0; margin-top: 3px; }
+    .detail-section { margin-bottom: 40px; }
+    .detail-section h2 { font-size: 22px; font-weight: 700; margin-bottom: 20px; color: var(--gray-900); }
+    .highlights-grid { display: grid; gap: 16px; }
+    .highlights-grid.highlights-4 { grid-template-columns: repeat(4, 1fr); }
+    .highlights-grid.highlights-6 { grid-template-columns: repeat(3, 1fr); }
+    .highlight-card { text-align: center; padding: 24px 16px; background: var(--gray-50); border-radius: 12px; transition: transform 0.2s; }
+    .highlight-card:hover { transform: translateY(-2px); }
+    .highlight-icon { width: 56px; height: 56px; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; }
+    .highlight-icon img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .highlight-label { font-size: 13px; color: var(--gray-500); margin-bottom: 4px; }
+    .highlight-value { font-size: 18px; font-weight: 700; color: var(--primary-600); }
+    .spec-table { width: 100%; border-collapse: collapse; border-radius: 12px; overflow: hidden; }
+    .spec-table th, .spec-table td { padding: 14px 20px; text-align: left; border-bottom: 1px solid var(--gray-100); font-size: 14px; }
+    .spec-table th { background: var(--gray-50); font-weight: 600; color: var(--gray-700); width: 35%; }
+    .spec-table td { color: var(--gray-600); }
+    .spec-table tr:last-child th, .spec-table tr:last-child td { border-bottom: none; }
+    .spec-description { margin-top: 20px; font-size: 14px; color: var(--gray-500); line-height: 1.8; }
+    .detail-not-found { text-align: center; padding: 80px 24px; }
+    .detail-not-found h2 { font-size: 24px; margin-bottom: 12px; color: var(--gray-700); }
+    .detail-not-found p { color: var(--gray-500); margin-bottom: 24px; }
+    @media (max-width: 768px) {
+      .detail-hero { grid-template-columns: 1fr; gap: 24px; }
+      .highlights-grid { grid-template-columns: repeat(2, 1fr); }
+      .gallery-wrapper { gap: 10px; }
+      .gallery-nav { width: 40px; height: 40px; }
+      .gallery-nav svg { width: 18px; height: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="detail-page">
+    <div id="detailContent"></div>
+  </div>
+
+  <script src="js/nav.js"></script>
+  <script src="js/products-data.js"></script>
+  <script>
+    (function() {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('id');
+      const products = window.PRODUCTS_DATA || [];
+      const p = products.find(x => String(x.id) === String(id));
+      const container = document.getElementById('detailContent');
+
+      function t(zh, en) {
+        const _lang = localStorage.getItem('site_lang') || 'zh';
+        return _lang === 'zh' ? (zh || '') : (en || zh || '');
+      }
+
+      if (!p) {
+        container.innerHTML = `
+          <div class="detail-not-found">
+            <h2>${t('产品未找到', 'Product Not Found')}</h2>
+            <p>${t('该产品可能已下架或链接有误', 'This product may have been removed or the link is incorrect')}</p>
+            <a href="index.html" class="btn btn-primary">${t('返回首页', 'Back to Home')}</a>
+          </div>
+        `;
+        return;
+      }
+
+      document.title = t(p.name.zh, p.name.en) + ' - 芯云智家';
+
+      container.innerHTML = `
+        <a href="products.html" class="detail-back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          ${t('返回产品列表', 'Back to Products')}
+        </a>
+        <div class="detail-hero">
+          ${p.gallery && p.gallery.length ? `
+          <div>
+            <div class="gallery-wrapper">
+              <button class="gallery-nav prev" onclick="switchDetailGallery(-1)" title="${t('上一张', 'Previous')}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+              </button>
+              <div class="gallery-main" ondblclick="openDetailLightbox()" title="${t('双击放大查看', 'Double-click to zoom')}">
+                <img id="galleryMain" src="${p.gallery[0]}" alt="${t(p.name.zh, p.name.en)}">
+              </div>
+              <button class="gallery-nav next" onclick="switchDetailGallery(1)" title="${t('下一张', 'Next')}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </button>
+            </div>
+            <div class="gallery-thumbs">
+              ${p.gallery.map((src, i) => `
+              <div class="gallery-thumb ${i===0?'active':''}" onclick="setDetailGallery(${i})">
+                <img src="${src}" alt="">
+              </div>
+              `).join('')}
+            </div>
+          </div>
+          ` : `
+          <div class="detail-image">
+            ${p.icon || ''}
+          </div>
+          `}
+          <div class="detail-info">
+            <h1>${t(p.name.zh, p.name.en)}</h1>
+            ${p.tagline && (p.tagline.zh || p.tagline.en) ? `<p class="detail-tagline">${t(p.tagline.zh, p.tagline.en)}</p>` : ''}
+            <div class="detail-features">
+              <h4>${t('核心特性', 'Key Features')}</h4>
+              <div class="feature-list">
+                ${(p.features || []).map(f => `
+                  <div class="feature-item">
+                    <span class="feature-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                    <span>${t(f.zh, f.en)}</span>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        ${p.highlights && p.highlights.length ? `
+        <div class="detail-section">
+          <div class="highlights-grid highlights-${p.highlights.length}">
+            ${p.highlights.map(h => `
+              <div class="highlight-card">
+                <div class="highlight-icon">
+                  <img src="${h.icon}" alt="${t(h.label.zh, h.label.en)}">
+                </div>
+                <div class="highlight-label">${t(h.label.zh, h.label.en)}</div>
+                <div class="highlight-value">${t(h.value.zh, h.value.en)}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+        ` : ''}
+
+        <div class="detail-section">
+          <h2>${t('技术规格', 'Technical Specifications')}</h2>
+          <table class="spec-table">
+            ${(p.specs || []).map(s => `
+              <tr><th>${t(s.label.zh, s.label.en)}</th><td>${t(s.value.zh, s.value.en)}</td></tr>
+            `).join('')}
+          </table>
+          ${p.description ? `<p class="spec-description">${t(p.description.zh, p.description.en)}</p>` : ''}
+        </div>
+      `;
+
+      // 初始化gallery数据
+      if (p.gallery && p.gallery.length) {
+        window._detailGallery = { images: p.gallery, index: 0 };
+      }
+    })();
+
+    // ===== Gallery 切换 =====
+    function setDetailGallery(index) {
+      const g = window._detailGallery;
+      if (!g) return;
+      g.index = (index + g.images.length) % g.images.length;
+      document.getElementById('galleryMain').src = g.images[g.index];
+      document.querySelectorAll('.gallery-thumb').forEach((t, i) => {
+        t.classList.toggle('active', i === g.index);
+      });
+    }
+    function switchDetailGallery(dir) {
+      const g = window._detailGallery;
+      if (!g) return;
+      setDetailGallery(g.index + dir);
+    }
+
+    // ===== 灯箱：双击放大、滚轮缩放、拖拽移动 =====
+    function openDetailLightbox() {
+      const g = window._detailGallery;
+      if (!g) return;
+      let overlay = document.getElementById('detailLightbox');
+      if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'detailLightbox';
+        overlay.className = 'lightbox-overlay';
+        overlay.innerHTML = `
+          <button class="lightbox-close" onclick="closeDetailLightbox()">&times;</button>
+          <img class="lightbox-img" id="detailLightboxImg" src="" alt="">
+          <div class="lightbox-hint">${t('滚轮缩放 · 拖拽移动 · 点击空白或ESC关闭', 'Scroll to zoom · Drag to move · Click blank or ESC to close')}</div>
+        `;
+        document.body.appendChild(overlay);
+
+        const img = document.getElementById('detailLightboxImg');
+        let scale = 1, tx = 0, ty = 0, dragging = false, startX = 0, startY = 0;
+
+        function applyTransform() {
+          img.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
+        }
+        function resetTransform() {
+          scale = 1; tx = 0; ty = 0; applyTransform();
+        }
+
+        // 滚轮缩放
+        img.addEventListener('wheel', (e) => {
+          e.preventDefault();
+          const delta = e.deltaY > 0 ? -0.1 : 0.1;
+          scale = Math.max(0.5, Math.min(5, scale + delta));
+          applyTransform();
+        }, { passive: false });
+
+        // 拖拽移动
+        img.addEventListener('mousedown', (e) => {
+          e.preventDefault();
+          dragging = true;
+          img.classList.add('dragging');
+          startX = e.clientX - tx;
+          startY = e.clientY - ty;
+        });
+        document.addEventListener('mousemove', (e) => {
+          if (!dragging) return;
+          tx = e.clientX - startX;
+          ty = e.clientY - startY;
+          applyTransform();
+        });
+        document.addEventListener('mouseup', () => {
+          dragging = false;
+          img.classList.remove('dragging');
+        });
+
+        // 点击空白关闭
+        overlay.addEventListener('click', (e) => {
+          if (e.target === overlay) closeDetailLightbox();
+        });
+
+        // ESC关闭
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && overlay.classList.contains('open')) closeDetailLightbox();
+        });
+
+        window._detailLightboxReset = resetTransform;
+      }
+
+      document.getElementById('detailLightboxImg').src = g.images[g.index];
+      if (window._detailLightboxReset) window._detailLightboxReset();
+      overlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeDetailLightbox() {
+      const overlay = document.getElementById('detailLightbox');
+      if (overlay) overlay.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+  </script>
+</body>
+</html>

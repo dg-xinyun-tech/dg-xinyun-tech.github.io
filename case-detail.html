@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>方案详情 - 芯云智家</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap">
+  <style>
+    .detail-page { max-width: 1200px; margin: 0 auto; padding: 100px 24px 80px; position: relative; }
+    .navbar { background: #fff; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+    .navbar .nav-link { color: #475569; }
+    .navbar .logo-text { color: #1e293b; }
+    .navbar .nav-link.active { color: #2563eb; }
+    .detail-back { display: inline-flex; align-items: center; gap: 8px; color: var(--gray-500); text-decoration: none; font-size: 14px; margin-bottom: 24px; cursor: pointer; }
+    .detail-back:hover { color: var(--primary-600); }
+    .detail-hero { display: grid; grid-template-columns: 1.2fr 1fr; gap: 48px; margin-bottom: 48px; align-items: start; }
+    .detail-hero-img { aspect-ratio: 16/10; border-radius: 16px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+    .detail-hero-img svg, .detail-hero-img img { max-width: 85%; max-height: 85%; object-fit: contain; }
+    .detail-info h1 { font-size: 32px; font-weight: 700; margin-bottom: 12px; color: var(--gray-900); line-height: 1.3; }
+    .detail-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+    .detail-tag { display: inline-block; font-size: 12px; font-weight: 500; color: var(--primary-600); background: var(--primary-50); padding: 4px 12px; border-radius: 999px; }
+    .detail-client { font-size: 15px; color: var(--gray-500); margin-bottom: 24px; line-height: 1.7; }
+    .detail-summary { font-size: 15px; color: var(--gray-600); line-height: 1.8; margin-bottom: 24px; }
+    .detail-section { margin-bottom: 48px; }
+    .detail-section h2 { font-size: 22px; font-weight: 700; margin-bottom: 20px; color: var(--gray-900); display: flex; align-items: center; gap: 10px; }
+    .detail-section h2::before { content: ''; width: 4px; height: 22px; background: var(--primary-600); border-radius: 2px; }
+    .detail-section p { font-size: 15px; color: var(--gray-600); line-height: 1.9; }
+    .metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+    .metric-card { text-align: center; padding: 28px 16px; background: var(--gray-50); border-radius: 12px; transition: transform 0.2s; }
+    .metric-card:hover { transform: translateY(-2px); }
+    .metric-value { font-size: 28px; font-weight: 700; color: var(--primary-600); margin-bottom: 6px; }
+    .metric-label { font-size: 13px; color: var(--gray-500); }
+    .detail-not-found { text-align: center; padding: 80px 24px; }
+    .detail-not-found h2 { font-size: 24px; margin-bottom: 12px; color: var(--gray-700); }
+    .detail-not-found p { color: var(--gray-500); margin-bottom: 24px; }
+    @media (max-width: 768px) {
+      .detail-hero { grid-template-columns: 1fr; gap: 28px; }
+      .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+      .detail-info h1 { font-size: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="detail-page">
+    <div id="detailContent"></div>
+  </div>
+
+  <script src="js/nav.js"></script>
+  <script src="js/cases-data.js"></script>
+  <script>
+    (function() {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('id');
+      const cases = window.CASES_DATA || [];
+      const c = cases.find(x => String(x.id) === String(id));
+      const container = document.getElementById('detailContent');
+
+      function t(zh, en) {
+        const _lang = localStorage.getItem('site_lang') || 'zh';
+        return _lang === 'zh' ? (zh || '') : (en || zh || '');
+      }
+
+      if (!c) {
+        container.innerHTML = `
+          <div class="detail-not-found">
+            <h2>${t('方案未找到', 'Solution Not Found')}</h2>
+            <p>${t('该方案可能已下架或链接有误', 'This solution may have been removed or the link is incorrect')}</p>
+            <a href="cases.html" class="btn btn-primary">${t('返回方案列表', 'Back to Solutions')}</a>
+          </div>
+        `;
+        return;
+      }
+
+      document.title = t(c.title.zh, c.title.en) + ' - 芯云智家';
+
+      const gradient = c.gradient || 'linear-gradient(135deg,#1e3a8a,#3b82f6)';
+
+      container.innerHTML = `
+        <a href="cases.html" class="detail-back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          ${t('返回方案列表', 'Back to Solutions')}
+        </a>
+
+        <div class="detail-hero">
+          <div class="detail-hero-img" style="background:${gradient}">
+            ${c.icon || ''}
+          </div>
+          <div class="detail-info">
+            <h1>${t(c.title.zh, c.title.en)}</h1>
+            ${c.tags && c.tags.length ? `
+            <div class="detail-tags">
+              ${c.tags.map(tag => `<span class="detail-tag">${tag}</span>`).join('')}
+            </div>
+            ` : ''}
+            ${c.client && (c.client.zh || c.client.en) ? `<p class="detail-client"><strong>${t('适用场景', 'Applicable Scenarios')}：</strong>${t(c.client.zh, c.client.en)}</p>` : ''}
+            ${c.summary && (c.summary.zh || c.summary.en) ? `<p class="detail-summary">${t(c.summary.zh, c.summary.en)}</p>` : ''}
+          </div>
+        </div>
+
+        ${c.metrics && c.metrics.length ? `
+        <div class="detail-section">
+          <h2>${t('关键指标', 'Key Metrics')}</h2>
+          <div class="metrics-grid">
+            ${c.metrics.map(m => `
+              <div class="metric-card">
+                <div class="metric-value">${m.value}</div>
+                <div class="metric-label">${t(m.label.zh, m.label.en)}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+        ` : ''}
+
+        ${c.background && (c.background.zh || c.background.en) ? `
+        <div class="detail-section">
+          <h2>${t('场景背景', 'Background')}</h2>
+          <p>${t(c.background.zh, c.background.en)}</p>
+        </div>
+        ` : ''}
+
+        ${c.solution && (c.solution.zh || c.solution.en) ? `
+        <div class="detail-section">
+          <h2>${t('技术方案', 'Solution')}</h2>
+          <p>${t(c.solution.zh, c.solution.en)}</p>
+        </div>
+        ` : ''}
+
+        ${c.results && (c.results.zh || c.results.en) ? `
+        <div class="detail-section">
+          <h2>${t('应用效果', 'Results')}</h2>
+          <p>${t(c.results.zh, c.results.en)}</p>
+        </div>
+        ` : ''}
+      `;
+    })();
+  </script>
+</body>
+</html>

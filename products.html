@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>产品中心 - 芯云智家</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap">
+</head>
+<body>
+
+  <section class="page-hero">
+    <h1 data-zh="产品中心" data-en="Products">产品中心</h1>
+    <p data-zh="全栈产品矩阵，满足企业各阶段数字化需求" data-en="Full-stack product matrix, meeting digital needs at every stage">全栈产品矩阵，满足企业各阶段数字化需求</p>
+  </section>
+
+  <section class="section" style="background:#fff;">
+    <div class="container">
+      <div class="product-filters">
+        <button class="filter-btn active" data-filter="all" data-zh="全部产品" data-en="All Products">全部产品</button>
+        <button class="filter-btn" data-filter="cat_digital" data-zh="数字图传" data-en="Digital Video Link">数字图传</button>
+        <button class="filter-btn" data-filter="cat_analog" data-zh="模拟图传" data-en="Analog Video Link">模拟图传</button>
+        <button class="filter-btn" data-filter="cat_data" data-zh="数传" data-en="Data Link">数传</button>
+        <button class="filter-btn" data-filter="cat_integrated" data-zh="图/数一体" data-en="Video & Data Link">图/数一体</button>
+      </div>
+      <div class="products-grid" id="productsGrid"></div>
+    </div>
+  </section>
+
+  <script src="js/company-data.js"></script>
+  <script src="js/products-data.js"></script>
+  <script src="js/cases-data.js"></script>
+  <script src="js/nav.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
