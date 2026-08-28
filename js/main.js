@@ -467,7 +467,7 @@
   // ===== 联系表单（提交到 Cloudflare Worker → GitHub Issue） =====
   // 部署 Worker 后，将下面的地址替换为你的 Worker URL，例如：
   // const FORM_API_URL = 'https://form-worker.your-subdomain.workers.dev';
-  const FORM_API_URL = 'https://xinyun-message.xinyun-tech.workers.dev';
+  const FORM_API_URL = 'https://form-worker.dg-xinyun.workers.dev';
 
   function initContactForm() {
     const form = document.getElementById('contactForm');
