@@ -42,7 +42,7 @@
     let isAnimating = false;
     let autoTimer = null;
 
-    // 产品卡片核心特点映射：图传/数传/图数一体显示最大距离，模拟图传显示10ms
+    // 产品卡片核心特点映射：数字图传显示最大距离，模拟图传显示10ms
     const cardHighlights = {
       1: { value: "150", unit: "km", label: "最远传输距离" },
       2: { value: "10", unit: "ms", label: "超低延时" },
@@ -223,10 +223,21 @@
     });
     let currentFilter = localStorage.getItem('products_filter') || 'all';
     let currentPage = parseInt(localStorage.getItem('products_page')) || 1;
+
+    // 从URL参数读取筛选（导航栏点击分类跳转时）
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlFilter = urlParams.get('filter');
+    if (urlFilter) {
+      currentFilter = urlFilter;
+      localStorage.setItem('products_filter', currentFilter);
+      currentPage = 1;
+      localStorage.setItem('products_page', 1);
+    }
     const pageSize = 6; // 每页2行3列=6个
 
     function getFiltered() {
-      return currentFilter === 'all' ? products : products.filter(p => p.category === currentFilter);
+      if (currentFilter === 'all') return products;
+      return products.filter(p => p.category === currentFilter || (Array.isArray(p.tags) && p.tags.includes(currentFilter)));
     }
 
     function getTotalPages() {
@@ -334,7 +345,7 @@
     renderPagination();
   }
 
-  // ===== 方案案例4张图片 =====
+  // ===== 应用场景4张图片 =====
   function initCasesGrid() {
     const grid = document.getElementById('casesGrid4');
     if (!grid) return;
@@ -452,12 +463,17 @@
     document.body.style.overflow = '';
   }
 
-  // ===== 联系表单 =====
+  // ===== 联系表单（纯前端写入 Excel） =====
+  // ===== 联系表单（提交到 Cloudflare Worker → GitHub Issue） =====
+  // 部署 Worker 后，将下面的地址替换为你的 Worker URL，例如：
+  // const FORM_API_URL = 'https://form-worker.your-subdomain.workers.dev';
+  const FORM_API_URL = 'https://form-worker.dg-xinyun.workers.dev';
+
   function initContactForm() {
     const form = document.getElementById('contactForm');
     if (!form) return;
 
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
       let valid = true;
       const name = document.getElementById('formName');
@@ -475,10 +491,62 @@
       if (!phone.value.trim()) { phone.classList.add('error'); phone.nextElementSibling.textContent = t('请输入电话', 'Phone is required'); valid = false; }
       if (!message.value.trim()) { message.classList.add('error'); message.nextElementSibling.textContent = t('请输入留言内容', 'Message is required'); valid = false; }
 
-      if (valid) {
+      if (!valid) return;
+
+      const submitBtn = form.querySelector('.form-submit');
+      const originalText = submitBtn.textContent;
+      submitBtn.disabled = true;
+      submitBtn.textContent = t('提交中...', 'Submitting...');
+
+      try {
+        if (!FORM_API_URL) {
+          throw new Error(t('表单接口未配置，请联系管理员', 'Form API not configured'));
+        }
+
+        const resp = await fetch(FORM_API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: name.value.trim(),
+            email: email.value.trim(),
+            phone: phone.value.trim(),
+            message: message.value.trim()
+          })
+        });
+        const data = await resp.json();
+        if (!data.ok) throw new Error(data.msg || 'Unknown error');
+
+        form.reset();
         form.style.display = 'none';
-        document.getElementById('formSuccess').classList.add('show');
-        setTimeout(() => { form.reset(); form.style.display = ''; document.getElementById('formSuccess').classList.remove('show'); }, 4000);
+        const successEl = document.getElementById('formSuccess');
+        successEl.classList.add('show');
+
+        const goBack = () => {
+          if (window.history.length > 1) {
+            window.history.back();
+          } else {
+            window.location.href = 'index.html';
+          }
+        };
+
+        const backBtn = successEl.querySelector('.form-back-btn');
+        if (backBtn) backBtn.onclick = goBack;
+
+        let count = 5;
+        const countdownEl = document.getElementById('countdownNum');
+        const timer = setInterval(() => {
+          count--;
+          if (countdownEl) countdownEl.textContent = count;
+          if (count <= 0) {
+            clearInterval(timer);
+            goBack();
+          }
+        }, 1000);
+      } catch (err) {
+        alert(t('提交失败：' + err.message, 'Submission failed: ' + err.message));
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
       }
     });
   }

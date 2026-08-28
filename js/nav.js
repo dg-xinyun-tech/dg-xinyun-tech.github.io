@@ -8,39 +8,15 @@
   const NAV_ITEMS = [
     { page: 'index', href: 'index.html', zh: '首页', en: 'Home' },
     { page: 'products', href: 'products.html', zh: '产品中心', en: 'Products' },
-    { page: 'cases', href: 'cases.html', zh: '方案案例', en: 'Cases' },
+    { page: 'cases', href: 'cases.html', zh: '应用场景', en: 'Scenarios' },
     { page: 'about', href: 'about.html', zh: '公司简介', en: 'About' }
   ];
 
   const PRODUCT_CATEGORIES = [
-    {
-      zh: '数字图传', en: 'Digital Video Link',
-      products: [
-        { id: 1, zh: 'VD601 无线图传模块', en: 'VD601 Wireless Video Link' },
-        { id: 5, zh: 'VD602 无线图传模块', en: 'VD602 Wireless Video Link' },
-        { id: 6, zh: 'VA20 高清图传发射模块', en: 'VA20 HD Video Transmitter' }
-      ]
-    },
-    {
-      zh: '模拟图传', en: 'Analog Video Link',
-      products: [
-        { id: 2, zh: 'VA10 模拟图传', en: 'VA10 Analog Video Link' }
-      ]
-    },
-    {
-      zh: '数传模块', en: 'Data Link',
-      products: [
-        { id: 4, zh: 'D+ 远距离数传模块', en: 'D+ Long-range Data Link' },
-        { id: 7, zh: 'D 数传模块', en: 'D Data Link Module' }
-      ]
-    },
-    {
-      zh: '图数一体', en: 'Video & Data Link',
-      products: [
-        { id: 8, zh: 'VM+ 图数一体模块', en: 'VM+ Video & Data Module' },
-        { id: 9, zh: 'V3 图数一体模块', en: 'V3 Video & Data Module' }
-      ]
-    }
+    { zh: '数字图传', en: 'Digital Video Link', filter: 'cat_digital' },
+    { zh: '模拟图传', en: 'Analog Video Link', filter: 'cat_analog' },
+    { zh: '星型组网', en: 'Star Network', filter: 'cat_star' },
+    { zh: 'Mesh组网', en: 'Mesh Network', filter: 'cat_mesh' }
   ];
 
   // 获取当前页面
@@ -75,14 +51,9 @@
                 return `
                   <div class="nav-item-dropdown ${currentPage === item.page ? 'active' : ''}">
                     <a href="${item.href}" class="nav-link" data-page="${item.page}">${t(item.zh, item.en)}<svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></a>
-                    <div class="dropdown-menu">
+                    <div class="dropdown-menu dropdown-menu-cats">
                       ${PRODUCT_CATEGORIES.map(cat => `
-                        <div class="dropdown-col">
-                          <div class="dropdown-title">${t(cat.zh, cat.en)}</div>
-                          ${cat.products.map(p => `
-                            <a href="product-detail.html?id=${p.id}" class="dropdown-link">${t(p.zh, p.en)}</a>
-                          `).join('')}
-                        </div>
+                        <a href="products.html?filter=${cat.filter}" class="dropdown-cat-link">${t(cat.zh, cat.en)}</a>
                       `).join('')}
                     </div>
                   </div>
@@ -142,12 +113,12 @@
               <ul>
                 <li><a href="products.html">${t('数字图传', 'Digital Video Link')}</a></li>
                 <li><a href="products.html">${t('模拟图传', 'Analog Video Link')}</a></li>
-                <li><a href="products.html">${t('数传模块', 'Data Link')}</a></li>
-                <li><a href="products.html">${t('图数一体', 'Video & Data Link')}</a></li>
+                <li><a href="products.html">${t('星型组网', 'Star Network')}</a></li>
+                <li><a href="products.html">${t('Mesh组网', 'Mesh Network')}</a></li>
               </ul>
             </div>
             <div class="footer-col">
-              <h4>${t('方案案例', 'Solutions')}</h4>
+              <h4>${t('应用案例', 'Cases')}</h4>
               <ul>
                 <li><a href="solution-inspection.html">${t('巡检安防', 'Inspection Security')}</a></li>
                 <li><a href="solution-emergency.html">${t('应急作业', 'Emergency Operations')}</a></li>

@@ -8,6 +8,7 @@ window.PRODUCTS_DATA = [
     category: "cat_digital",
     categoryZh: "数字图传",
     categoryEn: "Digital Video Link",
+    tags: ["cat_star", "cat_mesh"],
     name: { zh: "VD601 无线图传模块", en: "VD601 Wireless Video Transmission Module" },
     tagline: { zh: "", en: "" },
     price: { zh: "面议", en: "Contact for price" },
@@ -126,9 +127,10 @@ window.PRODUCTS_DATA = [
   // ===== D+ 远距离数传模块 =====
   {
     id: 4,
-    category: "cat_data",
-    categoryZh: "数传",
-    categoryEn: "Data Link",
+    category: "cat_digital",
+    categoryZh: "数字图传",
+    categoryEn: "Digital Video Link",
+    tags: ["cat_star", "cat_mesh"],
     name: { zh: "D+ 远距离数传模块", en: "D+ Long-range Data Link Module" },
     tagline: { zh: "300km地对空 自适应跳频", en: "300km Air-to-Ground Adaptive FHSS" },
     price: { zh: "面议", en: "Contact for price" },
@@ -167,6 +169,7 @@ window.PRODUCTS_DATA = [
     category: "cat_digital",
     categoryZh: "数字图传",
     categoryEn: "Digital Video Link",
+    tags: ["cat_star", "cat_mesh"],
     name: { zh: "VD602 无线图传模块", en: "VD602 Wireless Video Transmission Module" },
     tagline: { zh: "15km地对空 100Mbps MESH组网", en: "15km A2G 100Mbps MESH" },
     price: { zh: "面议", en: "Contact for price" },
@@ -244,9 +247,10 @@ window.PRODUCTS_DATA = [
   // ===== D 数传模块 =====
   {
     id: 7,
-    category: "cat_data",
-    categoryZh: "数传",
-    categoryEn: "Data Link",
+    category: "cat_digital",
+    categoryZh: "数字图传",
+    categoryEn: "Digital Video Link",
+    tags: ["cat_star", "cat_mesh"],
     name: { zh: "D 数传模块", en: "D Data Link Module" },
     tagline: { zh: "30km地对空 500mW", en: "30km A2G 500mW" },
     price: { zh: "面议", en: "Contact for price" },
@@ -282,9 +286,10 @@ window.PRODUCTS_DATA = [
   // ===== VM+ 图数一体模块 =====
   {
     id: 8,
-    category: "cat_integrated",
-    categoryZh: "图数一体",
-    categoryEn: "Video & Data Link",
+    category: "cat_digital",
+    categoryZh: "数字图传",
+    categoryEn: "Digital Video Link",
+    tags: ["cat_star", "cat_mesh"],
     name: { zh: "VM+ 图数一体模块", en: "VM+ Video & Data Integrated Module" },
     tagline: { zh: "500km地对空 47Mbps AES256", en: "500km A2G 47Mbps AES256" },
     price: { zh: "面议", en: "Contact for price" },
@@ -318,9 +323,10 @@ window.PRODUCTS_DATA = [
   // ===== V3 图数一体模块 =====
   {
     id: 9,
-    category: "cat_integrated",
-    categoryZh: "图数一体",
-    categoryEn: "Video & Data Link",
+    category: "cat_digital",
+    categoryZh: "数字图传",
+    categoryEn: "Digital Video Link",
+    tags: ["cat_star", "cat_mesh"],
     name: { zh: "V3 图数一体模块", en: "V3 Video & Data Integrated Module" },
     tagline: { zh: "150km地对空 30Mbps 三频可选", en: "150km A2G 30Mbps Tri-band" },
     price: { zh: "面议", en: "Contact for price" },
