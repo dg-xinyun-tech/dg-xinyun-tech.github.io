@@ -73,8 +73,8 @@ window.COMPANY_DATA = {
   ],
   contact: {
     address: { zh: "广东省惠州市惠城区陈江街道澄海大道中电北斗芯创谷", en: "Zhongdian Beidou Xinchuang Valley, Chenghai Avenue, Chenjiang Subdistrict, Huicheng District, Huizhou, Guangdong" },
-    phone: "400-888-9999",
-    email: "fushangli5@gmail.com",
+    phone: "13430678070（尚兴团·技术） / 13301311008（袁绍昌·总经理）",
+    email: "Henry.019@live.com（尚兴团） / 859179101@qq.com（袁绍昌）",
     hours: { zh: "周一至周五 9:00 - 18:00", en: "Mon-Fri 9:00 - 18:00" }
   },
   footer: {
