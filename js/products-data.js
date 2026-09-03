@@ -12,7 +12,7 @@ window.PRODUCTS_DATA = [
     name: { zh: "VD601 无线图传", en: "VD601 Wireless Video Transmission Module" },
     tagline: { zh: "", en: "" },
     price: { zh: "面议", en: "Contact for price" },
-    icon: '<img src="assets/products/vd601.png" style="width:100%;height:100%;object-fit:contain;" alt="VD601">',
+    icon: '<img loading="lazy" decoding="async" src="assets/products/vd601.png" style="width:100%;height:100%;object-fit:contain;" alt="VD601">',
     gallery: [
       "assets/products/vd601-view1.png",
       "assets/products/vd601-view2.png",
@@ -56,7 +56,7 @@ window.PRODUCTS_DATA = [
     name: { zh: "VA10模拟图传", en: "VA10 Analog Video Link" },
     tagline: { zh: "", en: "" },
     price: { zh: "面议", en: "Contact for price" },
-    icon: '<img src="assets/products/va10.png" style="width:100%;height:100%;object-fit:contain;" alt="VA10">',
+    icon: '<img loading="lazy" decoding="async" src="assets/products/va10.png" style="width:100%;height:100%;object-fit:contain;" alt="VA10">',
     gallery: [
       "assets/products/va10-view1.png",
       "assets/products/va10-view2.png",
@@ -98,7 +98,7 @@ window.PRODUCTS_DATA = [
     name: { zh: "ZS1000 惯性导航传感器", en: "ZS1000 Inertial Navigation Sensor" },
     tagline: { zh: "高精度陀螺仪加速度计", en: "High-precision IMU" },
     price: { zh: "面议", en: "Contact for price" },
-    icon: '<img src="assets/products/zs1000.png" style="width:100%;height:100%;object-fit:contain;" alt="ZS1000">',
+    icon: '<img loading="lazy" decoding="async" src="assets/products/zs1000.png" style="width:100%;height:100%;object-fit:contain;" alt="ZS1000">',
     gallery: [
       "assets/products/zs1000.png",
       "assets/products/zs1000-view1.png",
@@ -134,7 +134,7 @@ window.PRODUCTS_DATA = [
     name: { zh: "D+ 远距离数传", en: "D+ Long-range Data Link Module" },
     tagline: { zh: "300km地对空 自适应跳频", en: "300km Air-to-Ground Adaptive FHSS" },
     price: { zh: "面议", en: "Contact for price" },
-    icon: '<img src="assets/products/d_plus.png" style="width:100%;height:100%;object-fit:contain;" alt="D+">',
+    icon: '<img loading="lazy" decoding="async" src="assets/products/d_plus.png" style="width:100%;height:100%;object-fit:contain;" alt="D+">',
     gallery: [
       "assets/products/d_plus.png",
       "assets/products/d_plus-view1.png"
@@ -173,7 +173,7 @@ window.PRODUCTS_DATA = [
     name: { zh: "VD602 无线图传", en: "VD602 Wireless Video Transmission Module" },
     tagline: { zh: "15km地对空 100Mbps MESH组网", en: "15km A2G 100Mbps MESH" },
     price: { zh: "面议", en: "Contact for price" },
-    icon: '<img src="assets/products/vd602.png" style="width:100%;height:100%;object-fit:contain;" alt="VD602">',
+    icon: '<img loading="lazy" decoding="async" src="assets/products/vd602.png" style="width:100%;height:100%;object-fit:contain;" alt="VD602">',
     gallery: [
       "assets/products/vd602.png",
       "assets/products/vd602-view2.png",
@@ -254,7 +254,7 @@ window.PRODUCTS_DATA = [
     name: { zh: "D 数传", en: "D Data Link Module" },
     tagline: { zh: "30km地对空 500mW", en: "30km A2G 500mW" },
     price: { zh: "面议", en: "Contact for price" },
-    icon: '<img src="assets/products/d.png" style="width:100%;height:100%;object-fit:contain;" alt="D">',
+    icon: '<img loading="lazy" decoding="async" src="assets/products/d.png" style="width:100%;height:100%;object-fit:contain;" alt="D">',
     gallery: [
       "assets/products/d.png",
       "assets/products/d-view1.png"
@@ -293,7 +293,7 @@ window.PRODUCTS_DATA = [
     name: { zh: "VM+ 图数一体", en: "VM+ Video & Data Integrated Module" },
     tagline: { zh: "500km地对空 47Mbps AES256", en: "500km A2G 47Mbps AES256" },
     price: { zh: "面议", en: "Contact for price" },
-    icon: '<img src="assets/products/vm_plus.png" style="width:100%;height:100%;object-fit:contain;" alt="VM+">',
+    icon: '<img loading="lazy" decoding="async" src="assets/products/vm_plus.png" style="width:100%;height:100%;object-fit:contain;" alt="VM+">',
     gallery: [],
     features: [
       { zh: "500km超远距图数一体传输", en: "Up to 500km ultra-long-range video & data transmission" },
@@ -330,7 +330,7 @@ window.PRODUCTS_DATA = [
     name: { zh: "V3 图数一体", en: "V3 Video & Data Integrated Module" },
     tagline: { zh: "150km地对空 30Mbps 三频可选", en: "150km A2G 30Mbps Tri-band" },
     price: { zh: "面议", en: "Contact for price" },
-    icon: '<img src="assets/products/v3.png" style="width:100%;height:100%;object-fit:contain;" alt="V3">',
+    icon: '<img loading="lazy" decoding="async" src="assets/products/v3.png" style="width:100%;height:100%;object-fit:contain;" alt="V3">',
     gallery: [],
     features: [
       { zh: "150km地对空图数一体传输", en: "Up to 150km air-to-ground video & data transmission" },
