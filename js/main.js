@@ -464,9 +464,8 @@
     document.body.style.overflow = '';
   }
 
-  // ===== 联系表单（提交到 Cloudflare Worker → GitHub Issue） =====
-  // 部署 Worker 后，将下面的地址替换为你的 Worker URL，例如：
-  // const FORM_API_URL = 'https://form-worker.your-subdomain.workers.dev';
+  // ===== 联系表单（提交到 Cloudflare Worker → QQ邮箱 SMTP 直发） =====
+  // Worker 地址（保持不变）：
   const FORM_API_URL = 'https://form-worker.dg-xinyun.workers.dev';
 
   function initContactForm() {
@@ -503,18 +502,30 @@
           throw new Error(t('表单接口未配置，请联系管理员', 'Form API not configured'));
         }
 
-        const resp = await fetch(FORM_API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name: name.value.trim(),
-            email: email.value.trim(),
-            phone: phone.value.trim(),
-            message: message.value.trim()
-          })
-        });
-        const data = await resp.json();
-        if (!data.ok) throw new Error(data.msg || 'Unknown error');
+        const controller = new AbortController();
+        const abortTimer = setTimeout(() => controller.abort(), 12000);
+        let resp;
+        try {
+          resp = await fetch(FORM_API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: name.value.trim(),
+              email: email.value.trim(),
+              phone: phone.value.trim(),
+              message: message.value.trim()
+            }),
+            signal: controller.signal
+          });
+        } catch (netErr) {
+          clearTimeout(abortTimer);
+          throw new Error(netErr.name === 'AbortError'
+            ? t('提交超时，请检查网络后重试', 'Request timed out, please check your network')
+            : t('无法连接留言服务，请稍后重试', 'Cannot reach the form service'));
+        }
+        clearTimeout(abortTimer);
+        const data = await resp.json().catch(() => ({ ok: false, msg: 'Bad response' }));
+        if (!resp.ok || !data.ok) throw new Error(data.msg || 'Unknown error');
 
         form.reset();
         form.style.display = 'none';
