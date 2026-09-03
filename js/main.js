@@ -12,24 +12,30 @@
   const cases = window.CASES_DATA || [];
   const company = window.COMPANY_DATA || {};
 
-  // ===== Hero背景图轮播（5秒切换，与产品轮播同步，背景+小图联动） =====
+  // ===== Hero：背景图（多图才轮播）与右侧小图（独立轮巡，互不影响） =====
   function initHeroBgCarousel() {
     const layers = document.querySelectorAll('.hero-bg-layer');
     const productLayers = document.querySelectorAll('.hero-product-layer');
-    // 只有一张背景图时不轮播，保持静态（首页已改为固定城市背景）
-    if (layers.length <= 1) return;
-    let current = 0;
-    const total = layers.length;
 
-    function switchBg() {
-      layers[current].classList.remove('active');
-      if (productLayers[current]) productLayers[current].classList.remove('active');
-      current = (current + 1) % total;
-      layers[current].classList.add('active');
-      if (productLayers[current]) productLayers[current].classList.add('active');
+    // 背景层：仅当存在多张背景图时才轮播（首页固定单张城市背景时保持静态）
+    if (layers.length > 1) {
+      let bg = 0;
+      setInterval(() => {
+        layers[bg].classList.remove('active');
+        bg = (bg + 1) % layers.length;
+        layers[bg].classList.add('active');
+      }, 5000);
     }
 
-    setInterval(switchBg, 5000);
+    // 右侧小图：多张时独立轮巡，不依赖背景层数量
+    if (productLayers.length > 1) {
+      let prod = 0;
+      setInterval(() => {
+        productLayers[prod].classList.remove('active');
+        prod = (prod + 1) % productLayers.length;
+        productLayers[prod].classList.add('active');
+      }, 5000);
+    }
   }
 
   // ===== 首页产品轮播（无缝循环） =====
@@ -495,6 +501,7 @@
       const submitBtn = form.querySelector('.form-submit');
       const originalText = submitBtn.textContent;
       submitBtn.disabled = true;
+      submitBtn.classList.add('loading');
       submitBtn.textContent = t('提交中...', 'Submitting...');
 
       try {
@@ -532,30 +539,18 @@
         const successEl = document.getElementById('formSuccess');
         successEl.classList.add('show');
 
-        const goBack = () => {
-          if (window.history.length > 1) {
-            window.history.back();
-          } else {
-            window.location.href = 'index.html';
-          }
+        // 留在本页，不自动跳转；点“继续留言”回到表单可再写一条
+        const againBtn = successEl.querySelector('.form-again-btn');
+        if (againBtn) againBtn.onclick = () => {
+          successEl.classList.remove('show');
+          form.style.display = '';
+          form.reset();
+          name.focus();
         };
-
-        const backBtn = successEl.querySelector('.form-back-btn');
-        if (backBtn) backBtn.onclick = goBack;
-
-        let count = 5;
-        const countdownEl = document.getElementById('countdownNum');
-        const timer = setInterval(() => {
-          count--;
-          if (countdownEl) countdownEl.textContent = count;
-          if (count <= 0) {
-            clearInterval(timer);
-            goBack();
-          }
-        }, 1000);
       } catch (err) {
         alert(t('提交失败：' + err.message, 'Submission failed: ' + err.message));
       } finally {
+        submitBtn.classList.remove('loading');
         submitBtn.disabled = false;
         submitBtn.textContent = originalText;
       }
