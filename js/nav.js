@@ -41,7 +41,7 @@
         <div class="container nav-container">
           <a href="index.html" class="logo">
             <span class="logo-icon">
-              <img src="assets/logo/logo-icon.png" alt="${lang === 'zh' ? '芯云智家' : 'CoreNexis'}" style="width:100%;height:100%;object-fit:contain;">
+              <img src="assets/logo/logo-icon.webp" alt="${lang === 'zh' ? '芯云智家' : 'CoreNexis'}" style="width:100%;height:100%;object-fit:contain;">
             </span>
             <span class="logo-text">${lang === 'zh' ? '芯云智家' : 'CoreNexis'}</span>
           </a>
@@ -78,7 +78,7 @@
       <div class="sidebar-overlay" id="sidebarOverlay"></div>
       <div class="mobile-sidebar" id="mobileSidebar">
         <div class="sidebar-header">
-          <a href="index.html" class="logo"><span class="logo-icon"><img src="assets/logo/logo-icon.png" alt="${lang === 'zh' ? '芯云智家' : 'CoreNexis'}" style="width:100%;height:100%;object-fit:contain;"></span><span class="logo-text">${lang === 'zh' ? '芯云智家' : 'CoreNexis'}</span></a>
+          <a href="index.html" class="logo"><span class="logo-icon"><img src="assets/logo/logo-icon.webp" alt="${lang === 'zh' ? '芯云智家' : 'CoreNexis'}" style="width:100%;height:100%;object-fit:contain;"></span><span class="logo-text">${lang === 'zh' ? '芯云智家' : 'CoreNexis'}</span></a>
           <div class="sidebar-close" id="sidebarClose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></div>
         </div>
         <div class="sidebar-nav" id="sidebarNav">
@@ -105,7 +105,7 @@
         <div class="container">
           <div class="footer-main">
             <div class="footer-brand">
-              <a href="index.html" class="logo"><span class="logo-icon"><img src="assets/logo/logo-icon.png" alt="${lang === 'zh' ? '芯云智家' : 'CoreNexis'}" style="width:100%;height:100%;object-fit:contain;"></span><span class="logo-text">${lang === 'zh' ? '芯云智家' : 'CoreNexis'}</span></a>
+              <a href="index.html" class="logo"><span class="logo-icon"><img src="assets/logo/logo-icon.webp" alt="${lang === 'zh' ? '芯云智家' : 'CoreNexis'}" style="width:100%;height:100%;object-fit:contain;"></span><span class="logo-text">${lang === 'zh' ? '芯云智家' : 'CoreNexis'}</span></a>
               <p class="footer-brand-desc">${t('深耕低空经济，为低空智能装备产业提供高性能核心硬件。', 'Deeply rooted in low-altitude economy, providing high-performance core hardware for intelligent equipment.')}</p>
             </div>
             <div class="footer-col">

@@ -355,10 +355,10 @@
     const fourCases = cases.slice(0, 4);
     // 4个案例对应的真人场景封面图
     const coverImages = [
-      'assets/scenes/scene_p2p.jpg',     // 点对点控制
-      'assets/scenes/scene_relay.jpg',   // 中继桥接传输
-      'assets/scenes/scene_star.jpg',    // 星形组网
-      'assets/scenes/scene_mesh.jpg'     // MESH组网
+      'assets/scenes/scene_p2p.webp',     // 点对点控制
+      'assets/scenes/scene_relay.webp',   // 中继桥接传输
+      'assets/scenes/scene_star.webp',    // 星形组网
+      'assets/scenes/scene_mesh.webp'     // MESH组网
     ];
 
     grid.innerHTML = fourCases.map((c, i) => `
