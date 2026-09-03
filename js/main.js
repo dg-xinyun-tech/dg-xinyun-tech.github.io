@@ -16,7 +16,8 @@
   function initHeroBgCarousel() {
     const layers = document.querySelectorAll('.hero-bg-layer');
     const productLayers = document.querySelectorAll('.hero-product-layer');
-    if (layers.length === 0) return;
+    // 只有一张背景图时不轮播，保持静态（首页已改为固定城市背景）
+    if (layers.length <= 1) return;
     let current = 0;
     const total = layers.length;
 
@@ -463,7 +464,6 @@
     document.body.style.overflow = '';
   }
 
-  // ===== 联系表单（纯前端写入 Excel） =====
   // ===== 联系表单（提交到 Cloudflare Worker → GitHub Issue） =====
   // 部署 Worker 后，将下面的地址替换为你的 Worker URL，例如：
   // const FORM_API_URL = 'https://form-worker.your-subdomain.workers.dev';
