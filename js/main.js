@@ -465,8 +465,8 @@
   }
 
   // ===== 联系表单（提交到 Cloudflare Worker → QQ邮箱 SMTP 直发） =====
-  // Worker 地址（保持不变）：
-  const FORM_API_URL = 'https://form-worker.dg-xinyun.workers.dev';
+  // Worker 地址：绑定自有域名（走 Cloudflare anycast，国内可直连，避开 workers.dev 封锁）
+  const FORM_API_URL = 'https://form.xinyunzj.com';
 
   function initContactForm() {
     const form = document.getElementById('contactForm');
